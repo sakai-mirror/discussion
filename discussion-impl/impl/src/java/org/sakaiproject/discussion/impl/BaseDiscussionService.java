@@ -1,6 +1,6 @@
 /**********************************************************************************
- * $URL: https://source.sakaiproject.org/svn/discussion/trunk/discussion-impl/impl/src/java/org/sakaiproject/discussion/impl/BaseDiscussionService.java $
- * $Id: BaseDiscussionService.java 8232 2006-04-25 01:11:55Z ggolden@umich.edu $
+ * $URL$
+ * $Id$
  ***********************************************************************************
  *
  * Copyright (c) 2003, 2004, 2005, 2006 The Sakai Foundation.
@@ -45,6 +45,7 @@ import org.sakaiproject.discussion.api.DiscussionService;
 import org.sakaiproject.entity.api.ContextObserver;
 import org.sakaiproject.entity.api.Edit;
 import org.sakaiproject.entity.api.Entity;
+import org.sakaiproject.entity.api.EntityTransferrer;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entity.api.ResourcePropertiesEdit;
@@ -82,7 +83,7 @@ import org.w3c.dom.NodeList;
  * To get the full list of categories, you must get the channel's categories, and add any that the set of messages for the channel has.
  * </p>
  */
-public abstract class BaseDiscussionService extends BaseMessageService implements DiscussionService, ContextObserver
+public abstract class BaseDiscussionService extends BaseMessageService implements DiscussionService, ContextObserver, EntityTransferrer
 {
 	/** Our logger. */
 	private static Log M_log = LogFactory.getLog(BaseDiscussionService.class);
@@ -625,16 +626,9 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 	}
 
 	/**
-	 * import tool(s) contents from the source context into the destination context
-	 * 
-	 * @param fromContext
-	 *        The source context
-	 * @param toContext
-	 *        The destination context
-	 * @param resourceIds
-	 *        when null, all resources will be imported; otherwise, only resources with those ids will be imported
+	 * {@inheritDoc}
 	 */
-	public void importEntities(String fromContext, String toContext, List resourceIds)
+	public void transferCopyEntities(String fromContext, String toContext, List resourceIds)
 	{
 		// get the channel associated with this site
 		String oChannelRef = channelReference(fromContext, SiteService.MAIN_CONTAINER);
