@@ -1,6 +1,6 @@
 /**********************************************************************************
- * $URL: https://source.sakaiproject.org/svn/discussion/trunk/discussion-api/api/src/java/org/sakaiproject/discussion/api/DiscussionService.java $
- * $Id: DiscussionService.java 8232 2006-04-25 01:11:55Z ggolden@umich.edu $
+ * $URL$
+ * $Id$
  ***********************************************************************************
  *
  * Copyright (c) 2003, 2004, 2005, 2006 The Sakai Foundation.
@@ -53,8 +53,8 @@ import org.sakaiproject.message.api.MessageService;
  */
 public interface DiscussionService extends MessageService
 {
-	/** This string can be used to find the service in the service manager. */
-	public static final String SERVICE_NAME = DiscussionService.class.getName();
+	/** The type string for this application: should not change over time as it may be stored in various parts of persistent entities. */
+	static final String APPLICATION_ID = "sakai:discussion";
 
 	/** This string starts the references to resources in this service. */
 	public static final String REFERENCE_ROOT = "/discussion";

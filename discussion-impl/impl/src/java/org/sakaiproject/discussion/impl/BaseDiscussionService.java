@@ -464,7 +464,7 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 					M_log.warn("parse(): unknown message subtype: " + subType + " in ref: " + reference);
 			}
 
-			ref.set(SERVICE_NAME, subType, id, container, context);
+			ref.set(APPLICATION_ID, subType, id, container, context);
 
 			return true;
 		}

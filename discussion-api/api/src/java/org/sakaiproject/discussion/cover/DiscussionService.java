@@ -1,6 +1,6 @@
 /**********************************************************************************
- * $URL: https://source.sakaiproject.org/svn/discussion/trunk/discussion-api/api/src/java/org/sakaiproject/discussion/cover/DiscussionService.java $
- * $Id: DiscussionService.java 8232 2006-04-25 01:11:55Z ggolden@umich.edu $
+ * $URL$
+ * $Id$
  ***********************************************************************************
  *
  * Copyright (c) 2003, 2004, 2005, 2006 The Sakai Foundation.
@@ -53,7 +53,7 @@ public class DiscussionService
 
 	private static org.sakaiproject.discussion.api.DiscussionService m_instance = null;
 
-	public static java.lang.String SERVICE_NAME = org.sakaiproject.discussion.api.DiscussionService.SERVICE_NAME;
+	public static java.lang.String APPLICATION_ID = org.sakaiproject.discussion.api.DiscussionService.APPLICATION_ID;
 
 	public static java.lang.String REFERENCE_ROOT = org.sakaiproject.discussion.api.DiscussionService.REFERENCE_ROOT;
 
