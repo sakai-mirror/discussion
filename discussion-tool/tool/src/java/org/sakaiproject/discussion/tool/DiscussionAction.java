@@ -1,6 +1,6 @@
 /**********************************************************************************
- * $URL: https://source.sakaiproject.org/svn/discussion/trunk/discussion-tool/tool/src/java/org/sakaiproject/discussion/tool/DiscussionAction.java $
- * $Id: DiscussionAction.java 8232 2006-04-25 01:11:55Z ggolden@umich.edu $
+ * $URL$
+ * $Id$
  ***********************************************************************************
  *
  * Copyright (c) 2003, 2004, 2005, 2006 The Sakai Foundation.
@@ -1810,7 +1810,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 			{
 				// no new category input
 				state.setAttribute(NEW_TOPIC_NEW_CATEGORY, new Boolean("false"));
-				category = ((String) params.getString("category")).trim();
+				category = params.getString("category")!=null?((String) params.getString("category")).trim():"";
 				state.setAttribute(NEW_TOPIC_CATEGORY, category);
 				if (category.length() == 0)
 				{
