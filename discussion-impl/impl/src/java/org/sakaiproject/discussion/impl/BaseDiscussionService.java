@@ -60,6 +60,7 @@ import org.sakaiproject.exception.PermissionException;
 import org.sakaiproject.javax.Filter;
 import org.sakaiproject.message.api.Message;
 import org.sakaiproject.message.api.MessageChannel;
+import org.sakaiproject.message.api.MessageChannelEdit;
 import org.sakaiproject.message.api.MessageHeader;
 import org.sakaiproject.message.api.MessageHeaderEdit;
 import org.sakaiproject.message.impl.BaseMessageService;
@@ -83,7 +84,8 @@ import org.w3c.dom.NodeList;
  * To get the full list of categories, you must get the channel's categories, and add any that the set of messages for the channel has.
  * </p>
  */
-public abstract class BaseDiscussionService extends BaseMessageService implements DiscussionService, ContextObserver, EntityTransferrer
+public abstract class BaseDiscussionService extends BaseMessageService implements DiscussionService, ContextObserver,
+		EntityTransferrer
 {
 	/** Our logger. */
 	private static Log M_log = LogFactory.getLog(BaseDiscussionService.class);
@@ -540,6 +542,41 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 	/**
 	 * {@inheritDoc}
 	 */
+	protected void parseMergeChannelExtra(Element element3, String channelRef)
+	{
+		// pick up the discussion channel categories
+		if (element3.getTagName().equals("categories"))
+		{
+			NodeList children4 = element3.getChildNodes();
+			final int length4 = children4.getLength();
+			for (int i4 = 0; i4 < length4; i4++)
+			{
+				Node child4 = children4.item(i4);
+				if (child4.getNodeType() == Node.ELEMENT_NODE)
+				{
+					Element element4 = (Element) child4;
+					if (element4.getTagName().equals("category"))
+					{
+						try
+						{
+							MessageChannelEdit c = editChannel(channelRef);
+							String category = element4.getAttribute("name");
+							commitChannel(c);
+							((DiscussionChannel) c).addCategory(category);
+						}
+						catch (Exception e)
+						{
+							M_log.warn("parseMergeChannelExtra: " + e.toString());
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public String archive(String siteId, Document doc, Stack stack, String archivePath, List attachments)
 	{
 		// prepare the buffer for the results log
@@ -725,8 +762,9 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 												// add the new resource into attachment collection area
 												ContentResource attachment = ContentHostingService.addAttachmentResource(
 														oAttachment.getProperties().getProperty(
-																ResourceProperties.PROP_DISPLAY_NAME), ToolManager.getCurrentPlacement().getContext(), ToolManager.getTool("sakai.discussion")
-																.getTitle(), oAttachment.getContentType(),
+																ResourceProperties.PROP_DISPLAY_NAME), ToolManager
+																.getCurrentPlacement().getContext(), ToolManager.getTool(
+																"sakai.discussion").getTitle(), oAttachment.getContentType(),
 														oAttachment.getContent(), oAttachment.getProperties());
 												// add to attachment list
 												nAttachments.add(m_entityManager.newReference(attachment.getReference()));
@@ -736,9 +774,9 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 												// add the new resource into resource area
 												ContentResource attachment = ContentHostingService.addResource(oAttachment
 														.getProperties().getProperty(ResourceProperties.PROP_DISPLAY_NAME),
-														ToolManager.getCurrentPlacement().getContext(), 1, oAttachment.getContentType(),
-														oAttachment.getContent(), oAttachment.getProperties(),
-														NotificationService.NOTI_NONE);
+														ToolManager.getCurrentPlacement().getContext(), 1, oAttachment
+																.getContentType(), oAttachment.getContent(), oAttachment
+																.getProperties(), NotificationService.NOTI_NONE);
 												// add to attachment list
 												nAttachments.add(m_entityManager.newReference(attachment.getReference()));
 											}
