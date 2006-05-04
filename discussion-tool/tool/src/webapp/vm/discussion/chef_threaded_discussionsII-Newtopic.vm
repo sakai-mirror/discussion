@@ -3,7 +3,7 @@
 		$tlang.getString("newtop.crenewtop")
 	</h3>
 		#if ($alertMessage)<div class="alertMessage">$tlang.getString("gen.alert") $validator.escapeHtml($alertMessage)</div>#end
-		<div style="display:block;clear:both"></div>
+		<div class="clear"></div>
 		<script type="text/javascript">
 			focus_path = [ "newcategory" ];
 			if (parent) if (parent.parent) parent.parent.window.scrollTo(0,400);
@@ -37,7 +37,7 @@
 						</select>
 					</p>	
 					<p class="shorttext">
-						<label for="newcategory" style="font-weight: normal;">					
+						<label for="newcategory">					
 							<span style="padding-left:2em">$tlang.getString("newtop.oradd")</span>
 						</label>	
 							#if ($!newcategory)
@@ -49,7 +49,7 @@
 				#else
 					<p class="shorttext">
 						<span class="reqStar">*</span>
-						<label for="category">							
+						<label for="newcategory">							
 							$tlang.getString("gen.cat")
 						</label>	
 						#if ($!newcategory)
@@ -60,18 +60,13 @@
 					</p>						
 				#end	
 				<p class="shorttext">
-					<label for="">
-						$tlang.getString("gen.dat")
-					</label>
-					$date.toStringLocalFullZ()
-				</p>	
-				<p class="shorttext">
 					<span class="reqStar">*</span>
 					<label for="subject">
 						$tlang.getString("newtop.toptit")
 					</label>	
 					<input type="text" id="subject" size ="25"  name="subject" value="$!newtopicsubject" />
 				</p>
+				<p class="labelindnt">$date.toStringLocalFullZ()</p>
 				<h4>
 					$tlang.getString("newtop.reptyp")
 				</h4>
@@ -82,12 +77,11 @@
 					<p class="checkbox"><input type="radio" name="style" value="thread" checked="checked" id="styleThread" /><label for="styleThread">$tlang.getString("newtop.allrep1")</label></p>
 					<p class="checkbox"><input type="radio" name="style" value="star" id="styleStar" /><label for="styleStar">$tlang.getString("newtop.allrep2")</label></p>
 				#end
-				<div style="font-weight:bold">
-					<label for="body">
+				
+					<h4>
 						$tlang.getString("gen.mes")
-					</label>	
-				</div>
-				<table border="0" style="margin:.3em 1em"><tr><td>
+					</h4>	
+				<table border="0" summary="layout"><tr><td>
 				<textarea name="body" id="body" cols="80" rows="30" wrap="virtual">$validator.escapeHtmlFormattedTextarea("$!newtopicbody")</textarea>
 				#chef_setupformattedtextarea("body")
 				</td></tr></table>
@@ -108,7 +102,7 @@
 						<input type="submit" name="eventSubmit_doAttachments" value="$tlang.getString("gen.addatt")" />
 					</div>
 				#else
-					<ul class="attachList">
+					<ul class="attachList indnt1">
 						#foreach ($attachment in $attachments) 
 							#set ($props = false)
 							#set ($props = $attachment.Properties) 
@@ -132,9 +126,9 @@
 					</div>
 				#end							
 			<div class="act">
-				<input type="submit" class="active"  name="eventSubmit_doNew_topic" value="$tlang.getString("newtop.addtop")" />
-				<input type="submit" name="eventSubmit_doNew_topic" value="$tlang.getString("gen.savdra")" />
-				<input type="submit" name="eventSubmit_doCancel_new_topic" value="$tlang.getString("gen.can")" />
+				<input type="submit"  accesskey="s"  class="active"  name="eventSubmit_doNew_topic" value="$tlang.getString("newtop.addtop")" />
+				<input type="submit" accesskey="d"  name="eventSubmit_doNew_topic" value="$tlang.getString("gen.savdra")" />
+				<input type="submit" accesskey="x"  name="eventSubmit_doCancel_new_topic" value="$tlang.getString("gen.can")" />
 			</div>
 		</form>
 	</div>

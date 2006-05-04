@@ -21,7 +21,7 @@
 		$tlang.getString("custom.cusdis")
 	</h3>
 	<div class="chefPortletContent">
-		#if ($alertMessage)<div class="alertMessage">$tlang.getString("gen.alert") $validator.escapeHtml($alertMessage)</div><div style="display:block;clear:both" />#end
+		#if ($alertMessage)<div class="alertMessage">$tlang.getString("gen.alert") $validator.escapeHtml($alertMessage)</div><div class="clear"></div>#end
 		<form action="#toolForm($action)" method="post">
 			<fieldset>
 				<legend>
@@ -30,7 +30,7 @@
 				<div class="chefSectionTitle ">
 					$tlang.getString("custom.howmanmes")
 				</div>
-				<div style="margin-left:1em">
+				<div class="indnt1">
 					<input type="text" name="$form-pagesize" id="$form-pagesize" value="$sizeValue" />
 				</div>
 			</fieldset>
@@ -73,8 +73,8 @@
 				</div>
 			</fieldset>
 			<div class="act">
-				<input type="submit" name="$form-submit" value="$tlang.getString("gen.sav")" />
-				<input type="submit" name="$form-cancel" value="$tlang.getString("gen.can")" />
+				<input type="submit" name="$form-submit" value="$tlang.getString("gen.sav")"  accesskey="s" />
+				<input type="submit" name="$form-cancel" value="$tlang.getString("gen.can")"  accesskey="x" />
 			</div>
 		</form>
 	</div>
