@@ -3,54 +3,29 @@
 		$tlang.getString("premes.premes")
 	</h3>
 <h4>$tlang.getString("premes.repto")</h4>
-<p style="font-size:1.2em">	
+<h5 class="textPanelHeader">	
 	#if ($starOrThread != "thread")
 		$topic.getDiscussionHeader().getSubject()
 	#else
 		$validator.escapeHtml($currentMessage.DiscussionHeader.Category) &gt; $topic.getDiscussionHeader().getSubject() &gt; $validator.escapeHtml($currentMessage.getDiscussionHeader().getSubject())
 	#end
-</p>	
+</h5>	
 	#if ($alertMessage)<div class="alertMessage">$tlang.getString("gen.alert") $validator.escapeHtml($alertMessage)</div>#end
-	<table class="itemSummary" cellspacing="0" border="0" summary="$tlang.getString("premes.theposmes")">
 		#set ($starOrThread = "thread")
 		#set ($props = $topic.getProperties())
 		#if ($!props)
 			#set ($starOrThread = $props.getProperty($props.getNamePropReplyStyle()))
 		#end
 		#if ($starOrThread != "thread")
-			<tr>
-				<th>
-					$tlang.getString("gen.fro2")
-				</th>
-				<td>
-					$validator.escapeHtml($currentMessage.getDiscussionHeader().getFrom().getDisplayName()) ($currentMessage.getDiscussionHeader().getDate().toStringLocalFullZ())
-				</td>
-			</tr>
-			<tr>
-				<th>
-					$tlang.getString("gen.mes")
-				</th>
-				<td>
-					$validator.limit($topic.Body, 100)
-				</td>
-			</tr>
+		<p class="textPanelFooter">
+			$validator.escapeHtml($currentMessage.getDiscussionHeader().getFrom().getDisplayName()) ($currentMessage.getDiscussionHeader().getDate().toStringLocalFullZ())
+		</p>	
+		<div class="textPanel">$validator.limit($topic.Body, 100)</div>
 		#else
-			<tr>
-				<th>
-					$tlang.getString("gen.fro2")
-				</th>
-				<td>
-					$validator.escapeHtml($currentMessage.getDiscussionHeader().getFrom().getDisplayName()) ($currentMessage.getDiscussionHeader().getDate().toStringLocalFullZ())
-				</td>
-			</tr> 
-			<tr>
-				<th>
-					$tlang.getString("gen.mes")
-				</th>
-				<td>
-					<span class="chefPre">$validator.escapeHtmlFormattedText($currentMessage.getBody())</span>
-				</td>
-			</tr>
+		<p class="textPanelFoooter">
+			$validator.escapeHtml($currentMessage.getDiscussionHeader().getFrom().getDisplayName()) ($currentMessage.getDiscussionHeader().getDate().toStringLocalFullZ())
+		</p>	
+		<div class="textPanel">$validator.escapeHtmlFormattedText($currentMessage.getBody())</div>
 		#end
 		#set ($size = 0)
 		#set ($props = false)
@@ -62,34 +37,27 @@
 		#end
 		#if ($size == 0)
 		#else
-			<tr>
-				<th>
-					Attachments:
-				</th>
-				<td>
-					<ul class="attachList">
-						#foreach ($attachment in $currentMessage.Header.Attachments) 
-							#set ($props = false)
-							#set ($props = $attachment.Properties) 
-							#if ($!props)
-								<li>
-									#if ($props.getBooleanProperty($props.NamePropIsCollection))
-										<img src = "#imageLink($contentTypeImageService.getContentTypeImage("folder"))" border="0" alt="$tlang.getString("gen.folatt")" />
-									#else
-										<img src = "#imageLink($contentTypeImageService.getContentTypeImage($props.getProperty($props.NamePropContentType)))" border="0" alt="$tlang.getString("gen.filatt")" />
-									#end
-									<a href="$attachment.Url" target="_blank">$validator.escapeHtml($props.getPropertyFormatted($props.NamePropDisplayName))</a>						
-									#if (!$props.getBooleanProperty($props.NamePropIsCollection))
-										($props.getPropertyFormatted($props.NamePropContentLength))
-									#end
-								</li>
+			<ul class="attachList">
+				#foreach ($attachment in $currentMessage.Header.Attachments) 
+					#set ($props = false)
+					#set ($props = $attachment.Properties) 
+					#if ($!props)
+						<li>
+							#if ($props.getBooleanProperty($props.NamePropIsCollection))
+								<img src = "#imageLink($contentTypeImageService.getContentTypeImage("folder"))" border="0" alt="$tlang.getString("gen.folatt")" />
+							#else
+								<img src = "#imageLink($contentTypeImageService.getContentTypeImage($props.getProperty($props.NamePropContentType)))" border="0" alt="$tlang.getString("gen.filatt")" />
 							#end
-						#end
-					</ul>
-				</td>
-			</tr>
+							<a href="$attachment.Url" target="_blank">$validator.escapeHtml($props.getPropertyFormatted($props.NamePropDisplayName))</a>						
+							#if (!$props.getBooleanProperty($props.NamePropIsCollection))
+								($props.getPropertyFormatted($props.NamePropContentLength))
+							#end
+						</li>
+					#end
+				#end
+			</ul>
 		#end
-	</table>
+		<hr class="itemSeparator" />
 	<form action="#toolForm($action)" method="post">
 		<input type="hidden" name="portletid" value="$portlet.ID" />
 		<input type="hidden" name="topicId" value="$topic.Id" />
@@ -97,8 +65,6 @@
 		<h4>
 			$tlang.getString("rep.yourrep")
 		</h4>	
-			</legend>
-			<table class="itemSummary" summary="This table contains the information for a reply message">	
 				#if ($currentMessage.ReplyToDepth != 0)
 					#if ($starOrThread.equals("star"))
 						<input type="hidden" name="replyto" value="totopic" id ="replytotopic" />
@@ -121,31 +87,12 @@
 *#
 					#end
 				#else
-					<tr><td><input type="hidden" name="replyto" value="totopic" /></td></tr>
+					<input type="hidden" name="replyto" value="totopic" />
 				#end
-				<tr>
-					<th>
-						$tlang.getString("rep.subtit")
-					</th>
-					<td>
-						<input type="hidden" name="subject" id="subject" value="$!subject" />
-						$!subject
-					</td>
-				</tr>
-				<tr>
-					<th>
-						$tlang.getString("gen.mes")
-					</th>
-					<td>
-						<input type="hidden" name="body" id="body" value="$validator.escapeHtml("$!body")" />
-						$validator.escapeHtmlFormattedText("$!body")
-					</td>
-				</tr>
-				<tr>
-					<th>
-						$tlang.getString("gen.att")
-					</th>
-					<td>
+				<input type="hidden" name="subject" id="subject" value="$!subject" />
+				<h5 class="textPanelHeader">$!subject</h5>
+				<input type="hidden" name="body" id="body" value="$validator.escapeHtml("$!body")" />
+				<div class="textPanel">$validator.escapeHtmlFormattedText("$!body")</div>
 						#set ($size = 0)
 						#set ($props = false)
 						#foreach ($attachment in $attachments) 
@@ -155,7 +102,6 @@
 							#end
 						#end
 						#if ($size == 0)
-							No attachments ...
 						#else
 							<ul class="attachList">
 								#foreach ($attachment in $attachments) 
@@ -177,16 +123,12 @@
 								#end
 							</ul>
 						#end							
-					</td>
-				</tr>
-			</table>
-		
 		<div class="act">
-			<input type="submit" class="active"  name="eventSubmit_doRespond" value="$tlang.getString("rep.addrep")" />
-			<input type="submit" name="eventSubmit_doCancel_reply_preview" value="$tlang.getString("gen.revise")" />
+			<input type="submit" accesskey="s" class="active"  name="eventSubmit_doRespond" value="$tlang.getString("rep.addrep")" />
+			<input type="submit" accesskey="e" name="eventSubmit_doCancel_reply_preview" value="$tlang.getString("gen.revise")" />
 ##			<input type="submit" name="eventSubmit_doCancel_reply_preview" value="Revise" />
-			<input type="submit" name="eventSubmit_doRespond_draft" value="$tlang.getString("gen.savdra")" />
-			<input type="submit" name="eventSubmit_doCancel_reply_preview" value="$tlang.getString("gen.can")" />
+			<input type="submit" accesskey="d" name="eventSubmit_doRespond_draft" value="$tlang.getString("gen.savdra")" />
+			<input type="submit" accesskey="x" name="eventSubmit_doCancel_reply_preview" value="$tlang.getString("gen.can")" />
 		</div>
 	</form>
 </div>

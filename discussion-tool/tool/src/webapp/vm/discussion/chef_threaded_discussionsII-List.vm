@@ -7,46 +7,36 @@
 doubleDeep = true;
 </script>
 ## to prevent horiz scroll on IE
+#*
 <!--[if IE]>
 	<script type="text/javascript" language="JavaScript">
 		document.body.style.width='96%'
 	</script>
 <![endif]--> 
+*#
 
-<div style="margin:0;padding:0;width:100%">
-			#if ($searching)
-				<div class="highlight" style="background-color:#FFFFA8 !important;padding:.3em .3em">
-					#if ($searchResultList.size()>0)
-						#if ($searchResultList.size() == 1)
-							$tlang.getString("list.oneite")
-						#else
-							$searchResultList.size() $tlang.getString("list.morite")
-						#end
-					#else 
-						$tlang.getString("list.noite")
-					#end
-				</div>
-			#end
+## gsilver - hiding the "you have found x items and putting them into the title instead - as it increases the height
+<div style="margin:0;padding:0;width:100%" #if ($searching) title="#if ($searchResultList.size()>0)#if ($searchResultList.size() == 1)$tlang.getString("list.oneite")"#else$searchResultList.size() $tlang.getString("list.morite")"#end#else$tlang.getString("list.noite")"#end#end>	
 		#if ($alertMessage)
 			<div class="alertMessage">$tlang.getString("gen.alert") $validator.escapeHtml($alertMessage)</div>
-			<div style="display:block;clear:both"></div>
+			<div class="clear"></div>
 		#end
 		#set ( $idString = $validator.escapeJavascript($currentMessage.Id))
 		#if ($!categories)
-			<table width="100%" border="0" cellspacing="0" cellpadding="3">
+			<table width="100%" border="0" cellspacing="0" cellpadding="3" class="listHier lines nolines">
 			#foreach ($category in $categories)
-				<tr style="background-color:#F0F0F0;">
-					<td width="4%" style="border-bottom:3px solid #fff">
+				<tr class="highLightRow">
+					<td style="width:1em;">
 						#if (!$expandedCategoryList.contains($category))
-							<a href="#" onclick="location='#toolLinkParam($action "doExpand_category" "category=$validator.escapeUrl($category)")'; return false;">
+							<a href="#" onclick="location='#toolLinkParam($action "doExpand_category" "category=$validator.escapeUrl($category)")'; return false;" title="$tlang.getString("list.exp")">
 								<img src = "#imageLink("sakai/expand.gif")" border="0" alt="$tlang.getString("list.exp")" /></a> 
 						#else
-							<a href="#" onclick="location='#toolLinkParam($action "doCollapse_category" "category=$validator.escapeUrl($category)")'; return false;">
+							<a href="#" onclick="location='#toolLinkParam($action "doCollapse_category" "category=$validator.escapeUrl($category)")'; return false;" title="$tlang.getString("list.col")">
 								<img src = "#imageLink("sakai/collapse.gif")" border="0" alt="$tlang.getString("list.col")" /></a> 
 						#end
 					</td>
-					<td nowrap="nowrap" style="border-bottom:3px solid #fff">
-						$validator.escapeHtml($category)
+					<td nowrap="nowrap">
+						<h3 style="display:inline">$validator.escapeHtml($category)</h3>
 						#if ($allow_remove_category)
 							<a href="#" onclick="location='#toolLinkParam($action "doDelete_category_confirm" "category=$validator.escapeUrl($category)")'; return false;" title="$tlang.getString("list.delcat")" >				
 								<img src = "#imageLink("sakai/delete.gif")" border="0" alt ="$tlang.getString("list.delcat")" /></a>
@@ -69,15 +59,15 @@ doubleDeep = true;
 								#set($depth=$message.getReplyToDepth())
 								#set ($replyNumber= $channel.getThreadNumberOfReplies($message))
 								#set ($topicId = $message.getId())
-								<tr   #if ($searchResultList.indexOf($message.Id) != -1) style="background-color:#FFFFA8"#end >
-									<td valign="bottom" style="white-space: nowrap;" width="4%">
+								<tr #if ($searchResultList.indexOf($message.Id) != -1) class="selectedFound" #end >
+									<td  style="white-space: nowrap;" >
 										#if ($currentMessage.Id == $message.Id)
-											<a name="$!idString" id="$!idString""><img src = "#imageLink("sakai/arrowhere.gif")" border="0" alt="$tlang.getString("list.curmes")"/></a>
+											<a name="$!idString" id="$!idString"><img src = "#imageLink("sakai/arrowhere.gif")" border="0" alt="$tlang.getString("list.curmes")" /></a>
 										#else
 											&nbsp;
 										#end
 									</td>
-									<td colspan="5" align="left" nowrap="nowrap">
+									<td colspan="5" align="left" nowrap="nowrap" class="specialLink">
 										#set ($text = "")
 										#if ($depth>0)
 											#foreach ($j in [1..$depth])
@@ -98,15 +88,19 @@ doubleDeep = true;
 ## (gsilver) since this the message I am looking at, don't need a link - taking out bold as well as it makes the screen bounce
 ##												<span style="font-weight:bold">
 ##													<a id="$validator.escapeJavascript($message.id)" href="#" onclick="location='#toolLinkParam($action "doShow" "messageId=$message.Id")'; return false;">#if ($message.getDiscussionHeader().getDraft())<span class="highlight">$tlang.getString("gen.dra") </span>#end
+														<h4 style="display:inline">
 														#if ($message.getDiscussionHeader().getDraft())<span class="highlight">$tlang.getString("gen.dra") </span>#end
 														$validator.limit($validator.escapeHtml($message.getDiscussionHeader().getSubject()), 50)
+														</h4>
 ##													</a>
 ##												</span>
 											#else
-												<a id="$validator.escapeJavascript($message.id)" href="#" onclick="location='#toolLinkParam($action "doShow" "messageId=$validator.escapeUrl($message.Id)")'; return false;">
-													#if ($message.getDiscussionHeader().getDraft())<span class="highlight">$tlang.getString("gen.dra") </span>#end
+												<h4 style="display:inline">
+													<a id="$validator.escapeJavascript($message.id)" href="#" onclick="location='#toolLinkParam($action "doShow" "messageId=$validator.escapeUrl($message.Id)")'; return false;" title="$tlang.getString("viemes")">
+														#if ($message.getDiscussionHeader().getDraft())<span class="highlight">$tlang.getString("gen.dra") </span>#end
 													$validator.limit($validator.escapeHtml($message.getDiscussionHeader().getSubject()), 50)
 												</a>
+												</h4>	
 											#end
 											#set ($size = $message.Header.Attachments.size())
 											#set ($props = false)
@@ -118,7 +112,7 @@ doubleDeep = true;
 													#end
 												#end
 											#end
-											<span style="font-size:.8em">
+											<span class="textPanelFooter">
 											#if ($replyNumber>0)
 												#if ($replyNumber==1) 
 													($tlang.getString("list.oneres"))
@@ -145,11 +139,13 @@ doubleDeep = true;
 													<img src = "#imageLink("sakai/delete.gif")" border="0" alt="$tlang.getString("list.delthi")" /></a>
 											#end
 										#else
-											<span style="font-weight:bold">
-												<a id="$validator.escapeJavascript($message.id)" href="#" onclick="location='#toolLinkParam($action "doShow" "messageId=$validator.escapeUrl($message.Id)")'; return false;">#if ($message.getDiscussionHeader().getDraft())<span class="highlight">$tlang.getString("gen.dra") </span>#end
-													$validator.limit($validator.escapeHtml($message.getDiscussionHeader().getSubject()), 50)
-												</a>
-											</span>
+											<h4 style="display:inline">
+												<span style="font-weight:bold">
+													<a id="$validator.escapeJavascript($message.id)" href="#" onclick="location='#toolLinkParam($action "doShow" "messageId=$validator.escapeUrl($message.Id)")'; return false;" title="$tlang.getString("viemes")">#if ($message.getDiscussionHeader().getDraft())<span class="highlight">$tlang.getString("gen.dra") </span>#end
+														$validator.limit($validator.escapeHtml($message.getDiscussionHeader().getSubject()), 50)
+													</a>
+												</span>
+											</h4>	
 											#set ($size = $message.Header.Attachments.size())
 											#set ($props = false)
 											#if (!$message.Header.Attachments.isEmpty())
@@ -160,7 +156,7 @@ doubleDeep = true;
 													#end
 												#end
 											#end
-											<span style="font-size:.8em">
+											<span class="textPanelFooter">
 											#if ($replyNumber>0)
 												#if ($replyNumber==1) 
 													($tlang.getString("list.oneres"))

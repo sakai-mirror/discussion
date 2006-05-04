@@ -9,10 +9,10 @@
 doubleDeep = true;
 focus_path = ["search"];
 </script>
-<div class="portletBody">
+##<div class="portletBody">
 	#if($menu)#toolbar($menu)#end
-	<div style="margin-top:.5em">
-		<div class="leftNav">
+	<div class="navPanel">
+		<div class="viewNav">
 			<form name="viewForm" class="inlineForm" method="post" action="#toolForm("ThreadedDiscussionIIAction")">
 				<input type="hidden" name="eventSubmit_doView" value="view" />
 				<label for="view"> $tlang.getString("toolbar.view")</label>
@@ -27,20 +27,21 @@ focus_path = ["search"];
 				</select>
 			</form>
 		</div>					
-		<div class="rightNav">
+		<div class="searchNav">
 			<form name="searchForm" class="inlineForm" action="#toolForm("ThreadedDiscussionIIAction")" method="post">
 				<input type="hidden" name="eventSubmit_doSearch" value="null" />
+				<label for="$form_search" class="skip">$tlang.getString("toolbar.search")</label>
 				<input size="20" value="$searchString" name="$form_search" id="$form_search" type="text" class="searchField" />
 				<a href="#" title="$tlang.getString("toolbar.search")" onclick="location = '#toolLink("ThreadedDiscussionIIAction" "doSearch")'+buildQueryString('searchForm');return false;">
-					<span class="act"><input type="button" value="$tlang.getString("toolbar.search")" class="button" /></span>
+					<input type="button" value="$tlang.getString("toolbar.search")" class="button" />
 				</a>
 				#if (($!searchString) && (!$searchString.equals("")))
 					<a href="#" title="$tlang.getString("toolbar.clesea")" onclick="location = '#toolLink("ThreadedDiscussionIIAction" "doSearch_clear")'+buildQueryString('searchForm');return false;">
-						<span class="act"><input type="button" class="button"  value="$tlang.getString("toolbar.clesea")" /></span>
+						<input type="button" class="button"  value="$tlang.getString("toolbar.clesea")" />
 					</a>
 				#end
 			</form>
 		</div>
 	</div>
-</div>	
+##</div>	
 

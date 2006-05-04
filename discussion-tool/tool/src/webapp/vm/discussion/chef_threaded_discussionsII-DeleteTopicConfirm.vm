@@ -12,59 +12,69 @@
 		#end
 		##		$tlang.getString("deltop.deltop")
 	</h3>
-	#if ($alertMessage)<div class="alertMessage">$tlang.getString("gen.alert"); $validator.escapeHtml($alertMessage)</div><div style="display:block;clear:both"></div>#end
+	#if ($alertMessage)<div class="alertMessage">$tlang.getString("gen.alert"); $validator.escapeHtml($alertMessage)</div><div class="clear"></div>#end
 	<script type="text/javascript">
 		focus_path = [ "eventSubmit_doDelete_topiic" ];
 		if (parent) if (parent.parent) parent.parent.window.scrollTo(0,400);
 	</script>
 	#if (!$!allowRemove)
-		<div class="alertMessage">$tlang.getString("youarenot6")</div><div style="display:block;clear:both" />
+		<div class="alertMessage">$tlang.getString("youarenot6")</div><div class="clear"></div>
 	#else
 		#if ($message.getReplyToDepth() == 0)
 			#if ($message.hasReplies())
-				<div class="alertMessage">$tlang.getString("deltop.areyousure1") </div><div style="display:block;clear:both" />
+				<div class="alertMessage">$tlang.getString("deltop.areyousure1") </div><div class="clear"></div>
 			#else
-				<div class="alertMessage">$tlang.getString("deltop.areyousure2")</div><div style="display:block;clear:both" />
+				<div class="alertMessage">$tlang.getString("deltop.areyousure2")</div><div class="clear"></div>
 			#end
 		#else
 			#if ($message.hasReplies())
-				<div class="alertMessage">$tlang.getString("delmes.areyousure1") </div><div style="display:block;clear:both" />
+				<div class="alertMessage">$tlang.getString("delmes.areyousure1") </div><div class="clear"></div>
 			#else
-				<div class="alertMessage">$tlang.getString("delmes.areyousure2")</div><div style="display:block;clear:both" />
+				<div class="alertMessage">$tlang.getString("delmes.areyousure2")</div><div class="clear"></div>
 			#end
 		#end
 	#end
 		<form name="forNotLetDeleteSelectedOnLoad"></form>
-			<div style="margin-left:$delete_item.ReplyToDepth$depthUnit">
+			<h4 class="textPanelHeader">
 				#if ($message.Header.draft)
 					<span class="highlight">$tlang.getString("gen.dra") </span>
 				#end
 				$validator.escapeHtml($message.Header.subject)
-				<p class="instruction" style="font-size:.9em;margin-top:.2em;margin-left:0">$validator.escapeHtml($message.Header.From.DisplayName) - ($message.Header.Date.toStringLocalFullZ())</p>
-			</div>
-				#foreach ($delete_item in $delete_messages)
-					#set ($depthUnit="em")
-						<div style="margin-left:$delete_item.ReplyToDepth$depthUnit">
+			</h4>	
+				<p class="textPanelFooter" >$validator.escapeHtml($message.Header.From.DisplayName) - ($message.Header.Date.toStringLocalFullZ())</p>
+
+			<hr class="itemSeparator" />
+			#foreach ($delete_item in $delete_messages)
+				#if ($delete_item.ReplyToDepth >= 4)
+					#set($header=6)
+				#else	
+					#set($header = ($delete_item.ReplyToDepth + 3))
+				#end	
+				#set ($depthUnit="em")
+					<div style="margin-left:$delete_item.ReplyToDepth$depthUnit">
+						<h$header  class="textPanelHeader">
 							#if ($delete_item.Header.draft)
 								<span class="highlight">$tlang.getString("gen.dra") </span>
 							#end
 							$validator.escapeHtml($delete_item.Header.subject)
-							<p class="instruction" style="font-size:.9em;margin-top:.2em;margin-left:0">$validator.escapeHtml($delete_item.Header.From.DisplayName) - ($delete_item.Header.Date.toStringLocalFullZ())
-						</div>	
+						</h$header>
+						<p class="textPanelFooter">$validator.escapeHtml($delete_item.Header.From.DisplayName) - ($delete_item.Header.Date.toStringLocalFullZ())</p>
+					</div>	
+	
 				#end
 	
 	<form action="#toolForm($action)" method="post">
 		<div class="act">
 			<input type="hidden" name="messageId" value="$message.id" />
 			#if ($!allowRemove)
-				<input type="submit" class="active"  name="eventSubmit_doDelete_message" id="eventSubmit_doDelete_message" 
+				<input type="submit" accesskey="s" class="active"  name="eventSubmit_doDelete_message" id="eventSubmit_doDelete_message" 
 					#if ($message.getReplyToDepth() == 0)
 						value="$tlang.getString("deltop.deltop")"
 					#else
 						value="$tlang.getString("gen.del") $tlang.getString("gen.mes")"
 					#end />
 			#end
-			<input type="submit" name="eventSubmit_doCancel_delete_message" value="$tlang.getString("gen.can")" />
+			<input type="submit"  accesskey="x"  name="eventSubmit_doCancel_delete_message" value="$tlang.getString("gen.can")" />
 		</div>
 	</form>
 </div>
