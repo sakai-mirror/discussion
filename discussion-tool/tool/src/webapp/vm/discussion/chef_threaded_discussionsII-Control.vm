@@ -32,6 +32,7 @@
 						#if ($alertMessage)<div class="alertMessage">$tlang.getString("gen.alert") $validator.escapeHtml($alertMessage)</div>#end
 						<form action="#toolForm($action)" method="post">
 							<input type="hidden" name="messageId" value="$id" />
+							<input type="hidden" name="panel" value="main" />
 							<table class="itemSummary" summary="$tlang.getString("control.thitabcon")">	
 								<tr>
 									<th>

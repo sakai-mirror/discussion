@@ -1342,7 +1342,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 			context.put("newtopicreplystyle", state.getAttribute(NEW_TOPIC_REPLY_STYLE));
 			context.put("contentTypeImageService", state.getAttribute(STATE_CONTENT_TYPE_IMAGE_SERVICE));
 			context.put("action", (String) state.getAttribute(STATE_ACTION));
-			context.put("attachments", state.getAttribute(RESPOND_ATTACHMENT));
+			context.put("attachments", state.getAttribute(ATTACHMENTS));
 
 			return (String) getContext(rundata).get("template") + "-Newtopic";
 		}
