@@ -73,8 +73,6 @@ public class DiscussionService
 
 	public static java.lang.String REF_TYPE_CHANNEL = org.sakaiproject.discussion.api.DiscussionService.REF_TYPE_CHANNEL;
 
-	public static java.lang.String REF_TYPE_CHANNEL_GROUPS = org.sakaiproject.discussion.api.DiscussionService.REF_TYPE_CHANNEL_GROUPS;
-
 	public static java.lang.String REF_TYPE_MESSAGE = org.sakaiproject.discussion.api.DiscussionService.REF_TYPE_MESSAGE;
 
 	public static org.sakaiproject.discussion.api.DiscussionChannel getDiscussionChannel(java.lang.String param0)
