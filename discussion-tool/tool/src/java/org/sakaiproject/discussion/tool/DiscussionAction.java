@@ -170,10 +170,6 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	/** the respond attachment */
 	private static final String RESPOND_ATTACHMENT = "threadeddiscussionII.respond_attachment";
 
-	/** The permission alert message eader */
-	/* private static final String PERMISSION_HEADER_STRING = "You are not allowed to "; */
-	private static final String PERMISSION_HEADER_STRING = rb.getString("youarenot5") + " ";
-
 	/** ************ delete message context ******************* */
 	/** the delete message id * */
 	private static final String DELETE_MESSAGE_ID = "threadeddiscussionII.delete_message_id";
@@ -210,8 +206,6 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	private static final String STATE_UPDATE = "update";
 
 	/** UI messages. */
-	private static final String PERMISSION_POST_MESSAGE = rb.getString("youdonot5");
-
 	private static final String STATE_DISPLAY_MESSAGE = "display_message";
 
 	private static final String STATE_LIST_PANNEL_UPDATED = "state_list_pannel_updated";
@@ -1091,7 +1085,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 			}
 			if (!allowed)
 			{
-				context.put("message", PERMISSION_POST_MESSAGE); // %%% or no message?
+				context.put("message", rb.getString("youdonot5")); // %%% or no message?
 			}
 			context.put("allow-send", new Boolean(allowed));
 
@@ -1636,7 +1630,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 			}
 			catch (PermissionException e)
 			{
-				addAlert(state, PERMISSION_HEADER_STRING + rb.getString("posthemes"));
+				addAlert(state, rb.getString("youarenot5") + " " + rb.getString("posthemes"));
 			}
 			catch (InUseException e)
 			{
@@ -1712,7 +1706,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 			}
 			catch (PermissionException e)
 			{
-				addAlert(state, PERMISSION_HEADER_STRING + rb.getString("viemes"));
+				addAlert(state, rb.getString("youarenot5") + " " + rb.getString("viemes"));
 			}
 			catch (InUseException e)
 			{
@@ -1909,7 +1903,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 				}
 				catch (PermissionException e)
 				{
-					addAlert(state, PERMISSION_HEADER_STRING + rb.getString("statop"));
+					addAlert(state, rb.getString("youarenot5") + " " + rb.getString("statop"));
 				}
 			} // if category has been specified.
 		}
@@ -2043,7 +2037,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 					}
 					catch (PermissionException e)
 					{
-						addAlert(state, PERMISSION_HEADER_STRING + rb.getString("res"));
+						addAlert(state, rb.getString("youarenot5") + " " + rb.getString("res"));
 					}
 					catch (IdUnusedException e)
 					{
@@ -2188,7 +2182,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 					}
 					catch (PermissionException e)
 					{
-						addAlert(state, PERMISSION_HEADER_STRING + rb.getString("res"));
+						addAlert(state, rb.getString("youarenot5") + " " + rb.getString("res"));
 					}
 					catch (IdUnusedException e)
 					{
@@ -3110,7 +3104,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 			}
 			catch (PermissionException e)
 			{
-				addAlert(state, PERMISSION_HEADER_STRING + rb.getString("toview"));
+				addAlert(state, rb.getString("youarenot5") + " " + rb.getString("toview"));
 			}
 		}
 		catch (IdUnusedException e)
@@ -3168,7 +3162,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 			}
 			catch (PermissionException e)
 			{
-				addAlert(state, PERMISSION_HEADER_STRING + rb.getString("toview"));
+				addAlert(state, rb.getString("youarenot5") + " " + rb.getString("toview"));
 			}
 		}
 		catch (IdUnusedException e)
