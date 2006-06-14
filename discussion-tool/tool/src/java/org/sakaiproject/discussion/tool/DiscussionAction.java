@@ -67,6 +67,7 @@ import org.sakaiproject.util.ResourceLoader;
 import org.sakaiproject.util.StringUtil;
 import org.sakaiproject.util.Validator;
 import org.sakaiproject.util.Web;
+import org.sakaiproject.vm.ActionURL;
 
 /**
  * <p>
@@ -88,6 +89,9 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 
 	/** the attachments** */
 	private static final String ATTACHMENTS = "threadeddiscussionII.attachments";
+
+	/** go to attachments helper view */
+	private static final String GO_ATTACHMENTS = "threadeddiscussionII.go_attachments";
 
 	/** the channel id ** */
 	private static final String STATE_CHANNEL_REF = "threadeddiscussionII.channel_id";
@@ -415,11 +419,6 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 			state.setAttribute(STATE_SORTED_ASC, Boolean.TRUE.toString());
 		}
 
-		if (state.getAttribute(ATTACHMENTS) == null)
-		{
-			state.setAttribute(ATTACHMENTS, EntityManager.newReferenceList());
-		}
-
 		if (state.getAttribute(STATE_ASCENDING) == null)
 		{
 			state.setAttribute(STATE_ASCENDING, new Boolean(config.getInitParameter(PARAM_ASCENDING)));
@@ -461,12 +460,13 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	 */
 	public void doAttachments(RunData data, Context context)
 	{
-		// get into helper mode with this helper tool
-		startHelper(data.getRequest(), "sakai.filepicker");
+		String peid = ((JetspeedRunData) data).getJs_peid();
+		SessionState state = ((JetspeedRunData) data).getPortletSessionState(peid);
+		
+		// trigger the switch on the next request (which is going to happen after this action is processed with its redirect response to the build)
+		state.setAttribute(GO_ATTACHMENTS, GO_ATTACHMENTS);
 
-		SessionState state = ((JetspeedRunData) data).getPortletSessionState(((JetspeedRunData) data).getJs_peid());
-
-		state.setAttribute(FilePickerHelper.FILE_PICKER_ATTACHMENTS, state.getAttribute(ATTACHMENTS));
+		state.setAttribute(FilePickerHelper.FILE_PICKER_ATTACHMENTS, state.getAttribute(ATTACHMENTS) != null?(List) state.getAttribute(ATTACHMENTS):new Vector());
 
 		ParameterParser params = data.getParameters();
 		String subject = params.getString("subject");
@@ -532,13 +532,20 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 			state.setAttribute(DRAFT_MESSAGE_SUBJECT, params.getString("subject").trim());
 			state.setAttribute(DRAFT_MESSAGE_REPLY_STYLE, params.getString("style"));
 		}
+		
+		// schedule a main refresh to excape from the control panel
+		schedulePeerFrameRefresh(mainPanelUpdateId(peid));
+	}	// doAttachments
+	
+	/**
+	 * Fire up the permissions editor
+	 */
+	protected void doAttachmentsNow(RunData data, Context context)
+	{
+		// get into helper mode with this helper tool
+		startHelper(data.getRequest(), "sakai.filepicker");
 
-		// make sure the Main panel is updated
-		String peid = ((JetspeedRunData) data).getJs_peid();
-		String main = VelocityPortletPaneledAction.mainPanelUpdateId(peid);
-		schedulePeerFrameRefresh(main);
-
-	} // doAttachments
+	} // doAttachmentsNow
 
 	/**
 	 * Setup our observer to be watching for change events for our channel.
@@ -577,7 +584,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	 * @return (optional) template name for this panel
 	 */
 	public String buildMainPanelContext(VelocityPortlet portlet, Context context, RunData rundata, SessionState state)
-	{
+	{	
 		context.put("mainFrameId", Web.escapeJavascript("Main" + ToolManager.getCurrentPlacement().getId()));
 
 		context.put("tlang", rb);
@@ -1056,7 +1063,14 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	 * @return (optional) template name for this panel
 	 */
 	public String buildControlPanelContext(VelocityPortlet portlet, Context context, RunData rundata, SessionState state)
-	{
+	{	
+		// we might be on the way to attachments...
+		if (state.getAttribute(GO_ATTACHMENTS) != null)
+		{
+			state.removeAttribute(GO_ATTACHMENTS);
+			doAttachmentsNow(rundata, context);
+		}
+		
 		context.put("tlang", rb);
 		String channelId = (String) state.getAttribute(STATE_CHANNEL_REF);
 		DiscussionChannel channel = null;
@@ -1644,7 +1658,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 			state.removeAttribute(DRAFT_MESSAGE_SUBJECT);
 			state.removeAttribute(DRAFT_MESSAGE_BODY);
 			state.removeAttribute(DRAFT_MESSAGE_REPLY_STYLE);
-			state.setAttribute(ATTACHMENTS, null);
+			state.removeAttribute(ATTACHMENTS);
 
 			// update the list panel
 			String peid = ((JetspeedRunData) data).getJs_peid();
@@ -1717,7 +1731,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 		if (state.getAttribute(STATE_MESSAGE) == null)
 		{
 			// save successful
-			state.setAttribute(ATTACHMENTS, null);
+			state.removeAttribute(ATTACHMENTS);
 
 			// update the list panel
 			String peid = ((JetspeedRunData) data).getJs_peid();
@@ -2057,7 +2071,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 
 		if (state.getAttribute(STATE_MESSAGE) == null)
 		{
-			state.setAttribute(ATTACHMENTS, null);
+			state.removeAttribute(ATTACHMENTS);
 			// respond sucessful
 			state.removeAttribute(RESPOND_REPLY_TO);
 			state.removeAttribute(RESPOND_SUBJECT);
@@ -2414,7 +2428,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	public void doCancel_delete_message(RunData data, Context context)
 	{
 		SessionState state = ((JetspeedRunData) data).getPortletSessionState(((JetspeedRunData) data).getJs_peid());
-		state.setAttribute(ATTACHMENTS, null);
+		state.removeAttribute(ATTACHMENTS);
 		state.setAttribute(DELETE_MESSAGE_ID, "");
 		state.removeAttribute(STATE_MODE);
 	} // doCancel_delelete_category
@@ -2442,7 +2456,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 		state.removeAttribute(DRAFT_MESSAGE_BODY);
 		state.removeAttribute(DRAFT_MESSAGE_REPLY_STYLE);
 		state.removeAttribute(STATE_DISPLAY_MESSAGE);
-		state.setAttribute(ATTACHMENTS, null);
+		state.removeAttribute(ATTACHMENTS);
 
 		String peid = ((JetspeedRunData) data).getJs_peid();
 		schedulePeerFrameRefresh(VelocityPortletPaneledAction.mainPanelUpdateId(peid) + "." + MONITOR_PANEL);
@@ -2464,7 +2478,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 		// clean state mode
 		state.removeAttribute(STATE_MODE);
 
-		state.setAttribute(ATTACHMENTS, null);
+		state.removeAttribute(ATTACHMENTS);
 	} // doCancel_new_topic
 
 	/**
@@ -2536,11 +2550,14 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 						ResourceProperties mProperties = m.getProperties();
 						state.setAttribute(DRAFT_MESSAGE_REPLY_STYLE, mProperties.getProperty(mProperties.getNamePropReplyStyle()));
 					}
-					state.setAttribute(ATTACHMENTS, mHeader.getAttachments());
+					if (mHeader.getAttachments() != null && mHeader.getAttachments().size() > 0)
+					{
+						state.setAttribute(ATTACHMENTS, mHeader.getAttachments());
+					}
 				}
 				else
 				{
-					state.setAttribute(ATTACHMENTS, null);
+					state.removeAttribute(ATTACHMENTS);
 				}
 				DisplayMessage dMessage = new DisplayMessage(messageId);
 				state.setAttribute(STATE_DISPLAY_MESSAGE, dMessage);
@@ -2677,7 +2694,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	public void doSet_new_topic(RunData data, Context context)
 	{
 		SessionState state = ((JetspeedRunData) data).getPortletSessionState(((JetspeedRunData) data).getJs_peid());
-		state.setAttribute(ATTACHMENTS, null);
+		state.removeAttribute(ATTACHMENTS);
 		state.setAttribute(STATE_MODE, MODE_NEW_TOPIC);
 		addAlert(state, "");
 
@@ -2692,7 +2709,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	public void doSet_new_category(RunData data, Context context)
 	{
 		SessionState state = ((JetspeedRunData) data).getPortletSessionState(((JetspeedRunData) data).getJs_peid());
-		state.setAttribute(ATTACHMENTS, null);
+		state.removeAttribute(ATTACHMENTS);
 		state.setAttribute(STATE_MODE, MODE_NEW_CATEGORY);
 		addAlert(state, "");
 
