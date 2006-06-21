@@ -466,8 +466,6 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 		// trigger the switch on the next request (which is going to happen after this action is processed with its redirect response to the build)
 		state.setAttribute(GO_ATTACHMENTS, GO_ATTACHMENTS);
 
-		state.setAttribute(FilePickerHelper.FILE_PICKER_ATTACHMENTS, state.getAttribute(ATTACHMENTS) != null?(List) state.getAttribute(ATTACHMENTS):new Vector());
-
 		ParameterParser params = data.getParameters();
 		String subject = params.getString("subject");
 
@@ -544,6 +542,12 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	{
 		// get into helper mode with this helper tool
 		startHelper(data.getRequest(), "sakai.filepicker");
+		SessionState state = ((JetspeedRunData) data).getPortletSessionState(((JetspeedRunData) data).getJs_peid());
+		if (state.getAttribute(ATTACHMENTS) == null)
+		{
+			state.setAttribute(ATTACHMENTS, EntityManager.newReferenceList());
+		}
+		state.setAttribute(FilePickerHelper.FILE_PICKER_ATTACHMENTS, state.getAttribute(ATTACHMENTS));
 
 	} // doAttachmentsNow
 
@@ -1116,6 +1120,10 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 
 						DiscussionMessageHeader mHeader = m.getDiscussionHeader();
 						String replyTo = (String) state.getAttribute(RESPOND_REPLY_TO);
+						if (state.getAttribute(ATTACHMENTS) == null)
+						{
+							state.setAttribute(ATTACHMENTS, mHeader.getAttachments());
+						}
 						context.put("attachments", state.getAttribute(ATTACHMENTS));
 						if (mHeader.getDraft())
 						{
@@ -1336,6 +1344,13 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	 */
 	public String buildNewTopicContext(VelocityPortlet portlet, Context context, RunData rundata, SessionState state)
 	{
+		// we might be on the way to attachments...
+		if (state.getAttribute(GO_ATTACHMENTS) != null)
+		{
+			state.removeAttribute(GO_ATTACHMENTS);
+			doAttachmentsNow(rundata, context);
+		}
+		
 		String channelId = (String) state.getAttribute(STATE_CHANNEL_REF);
 		context.put("tlang", rb);
 		try
@@ -1480,6 +1495,13 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	 */
 	public String buildReplyContext(VelocityPortlet portlet, Context context, RunData rundata, SessionState state)
 	{
+		// we might be on the way to attachments...
+		if (state.getAttribute(GO_ATTACHMENTS) != null)
+		{
+			state.removeAttribute(GO_ATTACHMENTS);
+			doAttachmentsNow(rundata, context);
+		}
+		
 		String replyToMessageId = (String) state.getAttribute(RESPOND_REPLY_TO);
 		String channelId = (String) state.getAttribute(STATE_CHANNEL_REF);
 		context.put("tlang", rb);
@@ -2662,7 +2684,9 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 		SessionState state = ((JetspeedRunData) data).getPortletSessionState(((JetspeedRunData) data).getJs_peid());
 		String currentMessageId = ((DisplayMessage) state.getAttribute(STATE_DISPLAY_MESSAGE)).getId();
 		state.setAttribute(RESPOND_REPLY_TO, currentMessageId);
-		state.setAttribute(RESPOND_ATTACHMENT, new Vector());
+		// empty attachment to start with
+		state.setAttribute(ATTACHMENTS, EntityManager.newReferenceList());
+		state.setAttribute(RESPOND_ATTACHMENT, state.getAttribute(ATTACHMENTS));
 		state.setAttribute(STATE_MODE, MODE_REPLY);
 		state.setAttribute(STATE_REPLY_MSG, Boolean.TRUE);
 		state.removeAttribute(STATE_REPLY_TOPIC);
@@ -2678,7 +2702,9 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	{
 		SessionState state = ((JetspeedRunData) data).getPortletSessionState(((JetspeedRunData) data).getJs_peid());
 		state.setAttribute(RESPOND_REPLY_TO, data.getParameters().getString("topicId"));
-		state.setAttribute(RESPOND_ATTACHMENT, new Vector());
+		// empty attachment to start with
+		state.setAttribute(ATTACHMENTS, EntityManager.newReferenceList());
+		state.setAttribute(RESPOND_ATTACHMENT, state.getAttribute(ATTACHMENTS));
 		state.setAttribute(STATE_MODE, MODE_REPLY);
 		state.setAttribute(STATE_REPLY_TOPIC, Boolean.TRUE);
 		state.removeAttribute(STATE_REPLY_MSG);
