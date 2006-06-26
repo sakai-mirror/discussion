@@ -1192,6 +1192,8 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 					l.add(category);
 					e.setCategories(l);
 					m_storage.commitChannel(e);
+					
+					((BaseDiscussionChannelEdit) e).setEvent(SECURE_ADD_CATEGORY);
 
 					// track event (no notification)
 					Event event = EventTrackingService.newEvent(eventId(((BaseDiscussionChannelEdit) e).getEvent()), e

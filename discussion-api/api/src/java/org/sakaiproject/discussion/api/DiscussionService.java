@@ -61,6 +61,9 @@ public interface DiscussionService extends MessageService
 
 	/** Security lock for posting topic messages to a channel. */
 	public static final String SECURE_ADD_TOPIC = "new.topic";
+	
+	/** Security lock for posting category to a channel. */
+	public static final String SECURE_ADD_CATEGORY = "new.category";
 
 	/**
 	 * A (DiscussionChannel) cover for getChannel() to return a specific discussion channel.
