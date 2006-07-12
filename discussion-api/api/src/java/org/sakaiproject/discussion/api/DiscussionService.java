@@ -64,6 +64,9 @@ public interface DiscussionService extends MessageService
 	
 	/** Security lock for posting category to a channel. */
 	public static final String SECURE_ADD_CATEGORY = "new.category";
+	
+	/** Security lock for removing category from a channel. */
+	public static final String SECURE_REMOVE_CATEGORY = "delete.category";
 
 	/**
 	 * A (DiscussionChannel) cover for getChannel() to return a specific discussion channel.
