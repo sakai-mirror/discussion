@@ -68,6 +68,7 @@ import org.sakaiproject.site.cover.SiteService;
 import org.sakaiproject.time.api.Time;
 import org.sakaiproject.tool.cover.SessionManager;
 import org.sakaiproject.tool.cover.ToolManager;
+import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.util.StringUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -739,7 +740,14 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 						DiscussionMessageHeaderEdit nMessageHeader = nMessage.getDiscussionHeaderEdit();
 						nMessageHeader.setDate(oMessageHeader.getDate());
 						nMessageHeader.setDraft(true);
-						nMessageHeader.setFrom(oMessageHeader.getFrom());
+						try
+						{
+							nMessageHeader.setFrom(m_userDirectoryService.getUser(m_sessionManager.getCurrentSessionUserId()));
+						}
+						catch (UserNotDefinedException e)
+						{
+							nMessageHeader.setFrom(m_userDirectoryService.getAnonymousUser());
+						}
 						nMessageHeader.setSubject(oMessageHeader.getSubject());
 						nMessageHeader.setCategory(category);
 						// attachment
