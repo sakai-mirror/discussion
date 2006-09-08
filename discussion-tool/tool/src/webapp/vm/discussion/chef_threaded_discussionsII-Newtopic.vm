@@ -41,10 +41,12 @@
 							<span style="padding-left:2em">$tlang.getString("newtop.oradd")</span>
 						</label>	
 							#if ($!newcategory)
-								<input type="text" name="newcategory" size ="25" id="newcategory" value="$validator.escapeHtml($category)" />
+								<input type="text" name="newcategory" size ="25" id="newcategory" value="$validator.escapeHtml($category)" 
 							#else
-								<input type="text" name="newcategory" size ="25"  id="newcategory" value="" />
+								<input type="text" name="newcategory" size ="25"  id="newcategory" value=""
 							#end
+							onkeydown="if ((event.which && event.which == 13) || (event.keyCode && event.keyCode == 13)){return false}"
+							/>
 						</p>	
 				#else
 					<p class="shorttext">
@@ -53,10 +55,12 @@
 							$tlang.getString("gen.cat")
 						</label>	
 						#if ($!newcategory)
-							<input type="text" name="newcategory" size ="25"  id="newcategory" value="$validator.escapeHtml($category)" />
+							<input type="text" name="newcategory" size ="25"  id="newcategory" value="$validator.escapeHtml($category)" 
 						#else
-							<input type="text" name="newcategory" size ="25"  id="newcategory" value="" />
+							<input type="text" name="newcategory" size ="25"  id="newcategory" value="" 
 						#end
+							onkeydown="if ((event.which && event.which == 13) || (event.keyCode && event.keyCode == 13)){return false}"
+							/>
 					</p>						
 				#end	
 				<p class="shorttext">
@@ -64,7 +68,9 @@
 					<label for="subject">
 						$tlang.getString("newtop.toptit")
 					</label>	
-					<input type="text" id="subject" size ="25"  name="subject" value="$!newtopicsubject" />
+					<input type="text" id="subject" size ="25"  name="subject" value="$!newtopicsubject"
+						onkeydown="if ((event.which && event.which == 13) || (event.keyCode && event.keyCode == 13)){return false}"
+					/>
 				</p>
 				<p class="labelindnt">$date.toStringLocalFullZ()</p>
 				<h4>
