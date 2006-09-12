@@ -92,7 +92,9 @@
 				<label for="shorttext">
 					$tlang.getString("rep.subtit")
 				</label>	
-				<input type="text" name="subject" id="subject" value="$!subject" />
+				<input type="text" name="subject" id="subject" value="$!subject" 
+							onkeydown="if ((event.which && event.which == 13) || (event.keyCode && event.keyCode == 13)){return false}"
+				/>
 			</p>
 			<p class="labelindnt">
 				$realDate.toStringLocalFullZ()
