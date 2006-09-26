@@ -222,7 +222,7 @@
 							#if ($!allow-send)
 								<form action="#toolForm($action)" method="post">
 									<input type="hidden" name="topicId" value="$!topic.getId()" />
-									<div class="act" >
+									<div class="act" style="padding:0">
 										#if ($currentMessage.ReplyToDepth != 0 && $!style == "thread")
 											<input type="submit" name="eventSubmit_doSet_reply_msg" value="$tlang.getString("control.repmsg")" />
 										#end
