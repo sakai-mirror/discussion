@@ -147,7 +147,10 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 
 	/** the new topic reply message style */
 	private static final String NEW_TOPIC_REPLY_STYLE = "threadeddiscussionII.new_topic_reply_style";
-
+	
+	/** ********** new category context ******************** */
+	private static final String NEW_CATEGORY = "threadeddiscussionII.new_category";
+	
 	/** ********** draft topic context ******************** */
 	/** the draft message category */
 	private static final String DRAFT_MESSAGE_CATEGORY = "threadeddiscussionII.draft_message_category";
@@ -1398,6 +1401,10 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 			context.put("categories", sortedCategories(channel, STATE_SORTED_BY_CATEGORY_ALPHA, Boolean.TRUE.toString()));
 			context.put("contentTypeImageService", state.getAttribute(STATE_CONTENT_TYPE_IMAGE_SERVICE));
 			context.put("action", (String) state.getAttribute(STATE_ACTION));
+			if (state.getAttribute(NEW_CATEGORY) != null)
+			{
+				context.put("newcategory", state.getAttribute(NEW_CATEGORY));
+			}
 			return (String) getContext(rundata).get("template") + "-Newcategory";
 		}
 		catch (IdUnusedException e)
@@ -1774,32 +1781,43 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 			DiscussionChannel channel = DiscussionService.getDiscussionChannel((String) state.getAttribute(STATE_CHANNEL_REF));
 
 			ParameterParser params = data.getParameters();
-			String category = ((String) params.getString("newcategory")).trim();
+			String category = StringUtil.trimToNull((String) params.getString("newcategory"));
 
-			if (category.length() == 0)
+			if (category == null)
 			{
 				addAlert(state, rb.getString("pleent"));
 			}
 			else
 			{
-				try
+				state.setAttribute(NEW_CATEGORY, category);
+				
+				List categories = channel.getCategories(true);
+				
+				if (categories.contains(category))
 				{
-					// Note: removed code to detect that the category already exists - we just "fail" quietly to add it again -ggolden
-					addCategory(state, channel, category);
-
-					// clean the input frame
-					state.removeAttribute(STATE_DISPLAY_MESSAGE);
-
-					// clean the state mode
-					state.removeAttribute(STATE_MODE);
+					addAlert(state, rb.getString("samcat"));
 				}
-				catch (InUseException e)
+				else
 				{
-					addAlert(state, rb.getString("someone") + " channel.");
-				}
-				catch (PermissionException e)
-				{
-					addAlert(state, rb.getString("youdonot1"));
+					try
+					{
+						// Note: removed code to detect that the category already exists - we just "fail" quietly to add it again -ggolden
+						addCategory(state, channel, category);
+	
+						// clean the input frame
+						state.removeAttribute(STATE_DISPLAY_MESSAGE);
+	
+						// clean the state mode
+						state.removeAttribute(STATE_MODE);
+					}
+					catch (InUseException e)
+					{
+						addAlert(state, rb.getString("someone") + " channel.");
+					}
+					catch (PermissionException e)
+					{
+						addAlert(state, rb.getString("youdonot1"));
+					}
 				}
 			}
 		}
@@ -2736,6 +2754,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	{
 		SessionState state = ((JetspeedRunData) data).getPortletSessionState(((JetspeedRunData) data).getJs_peid());
 		state.removeAttribute(ATTACHMENTS);
+		state.removeAttribute(NEW_CATEGORY);
 		state.setAttribute(STATE_MODE, MODE_NEW_CATEGORY);
 		addAlert(state, "");
 
