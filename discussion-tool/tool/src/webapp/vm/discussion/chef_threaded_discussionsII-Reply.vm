@@ -152,7 +152,9 @@
 		<div class="act">
 			<input type="submit" accesskey="s" class="active" name="eventSubmit_doRespond" value="$tlang.getString("rep.addrep")" />
 			<input type="submit" accesskey="v" name="eventSubmit_doPreview" value="$tlang.getString("gen.pre")" />
-			<input type="submit" accesskey="d" name="eventSubmit_doRespond_draft" value="$tlang.getString("gen.savdra")" />
+			#if ($!allowSaveDraft)
+				<input type="submit" accesskey="d" name="eventSubmit_doRespond_draft" value="$tlang.getString("gen.savdra")" />
+			#end
 			<input type="submit" accesskey="x" name="eventSubmit_doCancel_reply" value="$tlang.getString("gen.can")" />
 		</div>
 	</form>
