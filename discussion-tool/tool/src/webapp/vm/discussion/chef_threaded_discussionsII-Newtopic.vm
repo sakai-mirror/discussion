@@ -133,7 +133,9 @@
 				#end							
 			<div class="act">
 				<input type="submit"  accesskey="s"  class="active"  name="eventSubmit_doNew_topic" value="$tlang.getString("newtop.addtop")" />
-				<input type="submit" accesskey="d"  name="eventSubmit_doNew_topic" value="$tlang.getString("gen.savdra")" />
+				#if ($!allowSaveDraft)
+					<input type="submit" accesskey="d"  name="eventSubmit_doNew_topic" value="$tlang.getString("gen.savdra")" />
+				#end
 				<input type="submit" accesskey="x"  name="eventSubmit_doCancel_new_topic" value="$tlang.getString("gen.can")" />
 			</div>
 		</form>

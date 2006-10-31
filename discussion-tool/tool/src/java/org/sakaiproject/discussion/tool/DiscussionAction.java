@@ -1,6 +1,6 @@
 /**********************************************************************************
- * $URL: https://source.sakaiproject.org/svn/discussion/trunk/discussion-tool/tool/src/java/org/sakaiproject/discussion/tool/DiscussionAction.java $
- * $Id: DiscussionAction.java 15785 2006-10-06 19:43:57Z zqian@umich.edu $
+ * $URL$
+ * $Id$
  ***********************************************************************************
  *
  * Copyright (c) 2003, 2004, 2005, 2006 The Sakai Foundation.
@@ -1369,6 +1369,9 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 			context.put("contentTypeImageService", state.getAttribute(STATE_CONTENT_TYPE_IMAGE_SERVICE));
 			context.put("action", (String) state.getAttribute(STATE_ACTION));
 			context.put("attachments", state.getAttribute(ATTACHMENTS));
+			
+			// is user allowed to save drats
+			context.put("allowSaveDraft", Boolean.valueOf(channel.allowAddDraftMessage()));
 
 			return (String) getContext(rundata).get("template") + "-Newtopic";
 		}
@@ -1515,6 +1518,10 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 		try
 		{
 			DiscussionChannel channel = DiscussionService.getDiscussionChannel(channelId);
+			
+			// is user allowed to save drats
+			context.put("allowSaveDraft", Boolean.valueOf(channel.allowAddDraftMessage()));
+			
 			try
 			{
 				DiscussionMessage m = channel.getDiscussionMessage(replyToMessageId);
@@ -1578,6 +1585,10 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 		try
 		{
 			DiscussionChannel channel = DiscussionService.getDiscussionChannel(channelId);
+			
+			// is user allowed to save drats
+			context.put("allowSaveDraft", Boolean.valueOf(channel.allowAddDraftMessage()));
+			
 			try
 			{
 				DiscussionMessage m = channel.getDiscussionMessage(replyToId);
