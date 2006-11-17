@@ -1,6 +1,6 @@
 /**********************************************************************************
- * $URL: https://source.sakaiproject.org/svn/discussion/trunk/discussion-impl/impl/src/java/org/sakaiproject/discussion/impl/BaseDiscussionService.java $
- * $Id: BaseDiscussionService.java 12248 2006-07-14 16:29:35Z zqian@umich.edu $
+ * $URL$
+ * $Id$
  ***********************************************************************************
  *
  * Copyright (c) 2003, 2004, 2005, 2006 The Sakai Foundation.
@@ -646,6 +646,8 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 					}
 				}
 			}
+			
+			archiveSynopticOptions(siteId, doc, element);
 
 			stack.pop();
 		}
@@ -739,7 +741,16 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 						nMessage.setBody(oMessage.getBody());
 						DiscussionMessageHeaderEdit nMessageHeader = nMessage.getDiscussionHeaderEdit();
 						nMessageHeader.setDate(oMessageHeader.getDate());
-						nMessageHeader.setDraft(true);
+						
+						if ("false".equalsIgnoreCase(m_serverConfigurationService.getString("import.importAsDraft")))
+						{
+							nMessageHeader.setDraft(oMessageHeader.getDraft());
+						}
+						else
+						{
+							nMessageHeader.setDraft(true);
+						}
+						
 						try
 						{
 							nMessageHeader.setFrom(m_userDirectoryService.getUser(m_sessionManager.getCurrentSessionUserId()));
@@ -829,6 +840,8 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 					} // for
 				} // for
 			} // if
+			
+			transferSynopticOptions(fromContext, toContext);
 		}
 		catch (IdUnusedException e)
 		{
