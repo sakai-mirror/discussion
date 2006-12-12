@@ -26,6 +26,9 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.Stack;
 import java.util.Vector;
 
 import org.sakaiproject.authz.api.PermissionsHelper;
@@ -267,6 +270,9 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 
 	/** State attribute set when we need to go into permissions mode. */
 	private static final String STATE_PERMISSIONS = "sakai:discussion:permissions";
+	
+	/** state variable for search results */
+	private static final String STATE_SEARCH_RESULT = "state_search_result";
 
 	/**
 	 * Populate the state object, if needed.
@@ -681,7 +687,11 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 				if (message != null)
 				{
 					String category = message.getDiscussionHeader().getCategory();
-					Vector messageIds = (Vector) ((Hashtable) state.getAttribute(STATE_CATEGORIES_SHOW_LIST)).get(category);
+					Vector messageIds = new Vector();
+					if (((Hashtable) state.getAttribute(STATE_CATEGORIES_SHOW_LIST)).get(category) != null)
+					{
+						messageIds = (Vector) ((Hashtable) state.getAttribute(STATE_CATEGORIES_SHOW_LIST)).get(category);
+					}
 					hasPrevious = (messageIds.indexOf(currentId) == 0) ? false : true;
 					hasNext = ((messageIds.indexOf(currentId) == messageIds.size() - 1)) ? false : true;
 				}
@@ -778,8 +788,6 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 		{
 			context.put("searching", Boolean.TRUE);
 		}
-
-		Vector searchResultList = new Vector();
 
 		String channelId = (String) state.getAttribute(STATE_CHANNEL_REF);
 
@@ -968,32 +976,24 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 							// update the show list in that category
 							showList.put(currentCategory, v);
 
-							// find the search result
-							if ((search != null) && (!search.equals("")))
-							{
-								for (int k = 0; k < v.size(); k++)
-								{
-									DiscussionMessage message = channel.getDiscussionMessage((String) v.get(k));
-									if (StringUtil.containsIgnoreCase(message.getDiscussionHeader().getSubject(), search)
-											|| StringUtil.containsIgnoreCase(FormattedText.convertFormattedTextToPlaintext(message
-													.getBody()), search))
-									{
-										searchResultList.add(message.getId());
-									}
-								}
-							}
 							state.setAttribute(STATE_CATEGORIES_SHOW_LIST, showList);
 						} // if: for every opened category
 					} // for: for all categories
 				} // if: categories not null
 
-				if (searchResultList.size() > 0 && state.getAttribute(STATE_SEARCH_REFRESH) != null)
+
+				Vector searchResultList = new Vector();
+				if (state.getAttribute(STATE_SEARCH_RESULT)!=null)
 				{
-					// if the current message is not in result list, make the current message to be the first one of search result
-					state.setAttribute(STATE_DISPLAY_MESSAGE, new DisplayMessage((String) searchResultList.get(0)));
-					state.removeAttribute(STATE_SEARCH_REFRESH);
+					searchResultList = (Vector) state.getAttribute(STATE_SEARCH_RESULT);
+					if (searchResultList.size() > 0)
+					{
+						// if the current message is not in result list, make the current message to be the first one of search result
+						state.setAttribute(STATE_DISPLAY_MESSAGE, new DisplayMessage((String) searchResultList.get(0)));
+						state.removeAttribute(STATE_SEARCH_REFRESH);
+					}
+					context.put("searchResultList", searchResultList);
 				}
-				context.put("searchResultList", searchResultList);
 
 				// provide the category show list
 				context.put("categoriesShowList", state.getAttribute(STATE_CATEGORIES_SHOW_LIST));
@@ -3087,7 +3087,10 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 
 		if (expand)
 		{
-			expandMessageCategory.add(message);
+			if (!expandMessageCategory.contains(message))
+			{
+				expandMessageCategory.add(message);
+			}
 
 			// divide the drafted messages and posted messages, drafted message come first
 			Vector drafts = new Vector();
@@ -3425,10 +3428,25 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 		// access the portlet element id to find our state
 		String peid = ((JetspeedRunData) runData).getJs_peid();
 		SessionState state = ((JetspeedRunData) runData).getPortletSessionState(peid);
+		
+		String channelId = (String) state.getAttribute(STATE_CHANNEL_REF);
+		// the sorting defaults for the outline view
+		String sortedAsc = (String) state.getAttribute(STATE_SORTED_ASC);
+		String sortedBy = (String) state.getAttribute(STATE_SORTED_BY);
+		if ((!sortedBy.equals(STATE_SORTED_BY_TOPIC)) && (!sortedBy.equals(STATE_SORTED_BY_AUTHOR))
+				&& (!sortedBy.equals(STATE_SORTED_BY_DATE)))
+		{
+			sortedBy = STATE_SORTED_BY_DATE;
+			state.setAttribute(STATE_SORTED_BY, sortedBy);
+		}
 
 		// read the search form field into the state object
 		String search = StringUtil.trimToNull(runData.getParameters().getString(FORM_SEARCH));
+		
+		Vector searchResultList = new Vector();
 
+		state.setAttribute(STATE_SEARCH_REFRESH, Boolean.TRUE);
+		
 		// set the flag to go to the prev page on the next list
 		if (search == null)
 		{
@@ -3437,10 +3455,109 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 		else
 		{
 			state.setAttribute(STATE_SEARCH, search);
+			
+		
+			try
+			{
+				// get the current channel ID from state object
+				DiscussionChannel channel = DiscussionService.getDiscussionChannel(channelId);
+	
+				// detect whether channel is existed
+				if (channel != null)
+				{
+					// get the sorted categories Vector according to the current sorting criteria
+					List categories = sortedCategories(channel, sortedBy, sortedAsc);
+	
+					// provide the expanded category list
+					HashSet expandedCategories = (HashSet) state.getAttribute(STATE_EXPAND_CATEGORY_LIST);
+					Hashtable showList = (Hashtable) state.getAttribute(STATE_CATEGORIES_SHOW_LIST);
+					Hashtable t = (Hashtable) state.getAttribute(STATE_EXPAND_MESSAGE_LIST);
+					HashSet s = new HashSet();
+					
+					if (categories != null)
+					{
+						String currentCategory = "";
+						
+						for (Iterator i = categories.iterator(); i.hasNext();)
+						{
+							// current category
+							currentCategory = (String) i.next();
+							
+							// show list in category
+							Vector v = (Vector) showList.get(currentCategory);
+							if (v == null) v = new Vector();
+							
+							s = (HashSet) t.get(currentCategory);
+							
+							Iterator allMessagesInCategory = channel.getThreads(currentCategory);
+							
+							// find the any message in the category matches search result
+							if ((search != null) && (!search.equals("")))
+							{
+								while (allMessagesInCategory.hasNext())
+								{
+									DiscussionMessage message = (DiscussionMessage) allMessagesInCategory.next();
+									if (StringUtil.containsIgnoreCase(message.getDiscussionHeader().getSubject(), search)
+											|| StringUtil.containsIgnoreCase(FormattedText.convertFormattedTextToPlaintext(message
+													.getBody()), search))
+									{
+										// mark the search finding
+										searchResultList.add(message.getId());
+										
+										// once the matching disucssion message is found, mark the corresponding category as expanded
+										expandedCategories.add(currentCategory);
+										
+										// recursively mark the all containing messages as expanded
+										if (message.getReplyToDepth() > 0)
+										{
+											// get the parent messages, sorted by depth ascendingly
+											Iterator parentMessages = parentMessageIterator(message, channel);
+											while (parentMessages.hasNext())
+											{
+												DiscussionMessage iMessage = (DiscussionMessage) parentMessages.next();
+												
+												// mark the message in shown list
+												if (!v.contains(iMessage.getId()))
+												{
+													v.add(iMessage.getId());
+												}
+												
+												// mark the message as expanded
+												s.add(iMessage);
+											}
+										}
+										
+										// mark the message in shown list
+										if (!v.contains(message.getId()))
+										{
+											v.add(message.getId());
+										}
+									}
+								}
+							}
+							
+							// assign back
+							showList.put(currentCategory, v);
+							t.put(currentCategory, s);
+						}
+						// update state variables
+						state.setAttribute(STATE_SEARCH_RESULT, searchResultList);
+						state.setAttribute(STATE_CATEGORIES_SHOW_LIST, showList);
+						state.setAttribute(STATE_EXPAND_CATEGORY_LIST, expandedCategories);
+						state.setAttribute(STATE_EXPAND_MESSAGE_LIST, t);
+					} // if: categories not null
+				}
+			}
+			catch (IdUnusedException e)
+			{
+				addAlert(state, rb.getString("cannotfin5"));
+			}
+			catch (PermissionException e)
+			{
+				addAlert(state, rb.getString("youdonot2"));
+			}
 		}
-
-		state.setAttribute(STATE_SEARCH_REFRESH, Boolean.TRUE);
-
+		
 		schedulePeerFrameRefresh(VelocityPortletPaneledAction.mainPanelUpdateId(peid) + "." + MONITOR_PANEL);
 
 		// disable auto-updates while in view mode
@@ -3448,6 +3565,60 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 
 	} // doSearch
 
+	/**
+	 * return an iterator consisting of all parent DiscussionMessage objects of the current DiscussionMessage item. 
+	 * Sorted by depth ascendingly
+	 */
+	protected Iterator parentMessageIterator(DiscussionMessage message, DiscussionChannel channel)
+	{
+		
+		// start the depth iteration stack with the topics of the channel
+		final Stack stack = new Stack();
+		DiscussionMessage m_message = message;
+		
+		// construct the stack
+		boolean atTopLevel = false;
+		while (!atTopLevel)
+		{
+			if (((DiscussionMessage) m_message).getReplyToDepth() > 0)
+			{
+				String pId = ((DiscussionMessage) m_message).getDiscussionHeader().getReplyTo();
+				
+				// detect whether channel is existed
+				if (channel != null)
+				{
+					try
+					{
+						DiscussionMessage nMessage = channel.getDiscussionMessage(pId);
+						// mark the message in shown list
+						if (!stack.contains(nMessage))
+						{
+							stack.push(nMessage);
+						}
+						// reassign
+						m_message = nMessage;
+					}
+					catch (Exception e)
+					{
+						Log.warn("chef", e.toString() + pId + e.toString());
+					}
+				}
+			}
+			else
+			{
+				atTopLevel = true;
+			}
+		}
+		
+		// prepare for return
+		List rv = new Vector();
+		while (!stack.empty())
+		{
+			rv.add(stack.pop());
+		}
+		return rv.iterator();
+	}
+	
 	/**
 	 * Handle a Search Clear request.
 	 */
@@ -3459,6 +3630,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 
 		// clear the search
 		state.removeAttribute(STATE_SEARCH);
+		state.removeAttribute(STATE_SEARCH_RESULT);
 
 		// turn on auto refresh
 		enableObserver(state);
