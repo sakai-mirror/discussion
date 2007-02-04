@@ -1,6 +1,6 @@
 /**********************************************************************************
- * $URL: https://source.sakaiproject.org/svn/discussion/trunk/discussion-api/api/src/java/org/sakaiproject/discussion/api/DiscussionService.java $
- * $Id: DiscussionService.java 12010 2006-07-12 16:51:45Z zqian@umich.edu $
+ * $URL$
+ * $Id$
  ***********************************************************************************
  *
  * Copyright (c) 2003, 2004, 2005, 2006 The Sakai Foundation.
@@ -20,6 +20,8 @@
  **********************************************************************************/
 
 package org.sakaiproject.discussion.api;
+
+import java.util.Map;
 
 import org.sakaiproject.exception.IdInvalidException;
 import org.sakaiproject.exception.IdUnusedException;
@@ -95,4 +97,24 @@ public interface DiscussionService extends MessageService
 	 *            if the user does not have permission to add a channel.
 	 */
 	public DiscussionChannelEdit addDiscussionChannel(String ref) throws IdUsedException, IdInvalidException, PermissionException;
+
+	/**
+         * Get a summary of a Discussion Channel
+         * 
+         * @param ref
+         *        The channel reference.
+         * @param items
+         *        Maximum number of items to return
+         * @param days
+         *        Maximum number of dayes to peer back
+         * @return The Map containnt the Summary
+         * @exception IdUsedException
+         *            if the id is not unique.
+         * @exception IdInvalidException
+         *            if the id is not made up of valid characters.
+         * @exception PermissionException
+         *            if the user does not have permission to add a channel.
+         */
+        public Map getSummary(String ref, int items, int days) throws IdUsedException, IdInvalidException, PermissionException;
+
 }
