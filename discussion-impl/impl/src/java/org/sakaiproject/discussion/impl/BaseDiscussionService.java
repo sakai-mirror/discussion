@@ -28,8 +28,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
-import java.util.Map;
-import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -679,39 +677,20 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 	}
 
         /**********************************************************************************************************************************************************************************************************************************************************
-         * getSummary implementation
+         * getSummaryFromHeader implementation
          *********************************************************************************************************************************************************************************************************************************************************/
-        public Map getSummary(String channel, int items, int days)
-                        throws org.sakaiproject.exception.IdUsedException, org.sakaiproject.exception.IdInvalidException,
-                        org.sakaiproject.exception.PermissionException
-        {
-            long startTime = System.currentTimeMillis() - (days * 24l * 60l * 60l * 1000l);
-
-            List messages = getMessages(channel, TimeService.newTime(startTime), items, false, false, false);
-            Iterator iMsg = messages.iterator();
-            Time pubDate = null;
-            String summaryText = null;
-            Map m = new HashMap();
-            while (iMsg.hasNext()) {
-                DiscussionMessage item  = (DiscussionMessage) iMsg.next();
-                DiscussionMessageHeader header = item.getDiscussionHeader();
-                Time newTime = header.getDate();
-                if ( pubDate == null || newTime.before(pubDate) ) pubDate = newTime;
-                String newText = header.getSubject() + ", " + header.getFrom().getDisplayName() + ", " + header.getDate().toStringLocalFull();
-                if ( summaryText == null ) {
-                    summaryText = newText;
-                } else {
-                    summaryText = summaryText + "<br>\r\n" + newText;
-                }
+         protected String getSummaryFromHeader(Message item, MessageHeader header)
+         {
+            String newText;
+            if ( header instanceof DiscussionMessageHeader) {
+                DiscussionMessageHeader hdr = (DiscussionMessageHeader) header;
+                newText = hdr.getSubject();
+            } else {
+              newText = item.getBody();
+              if ( newText.length() > 50 ) newText = newText.substring(1,49);
             }
-            if ( pubDate != null ) {
-                m.put(Summary.PROP_PUBDATE, pubDate.toStringRFC822Local());
-            }
-            if ( summaryText != null ) {
-                m.put(Summary.PROP_DESCRIPTION, summaryText);
-                return m;
-            }
-            return null;
+            newText = newText + ", " + header.getFrom().getDisplayName() + ", " + header.getDate().toStringLocalFull();
+            return newText;
         }
 
 	/**
