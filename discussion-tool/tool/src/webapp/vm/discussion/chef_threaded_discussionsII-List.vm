@@ -135,8 +135,13 @@ doubleDeep = true;
 												</a>
 											#end
 											#if ($channel.allowRemoveMessage($message))
-												<a href="#" onclick="location='#toolLinkParam($action "doDelete_message_confirm" "messageId=$validator.escapeUrl($message.Id)")'; return false;" title="$tlang.getString("list.delthi")">				
+												#if($depth==0)
+												<a href="#" onclick="location='#toolLinkParam($action "doDelete_message_confirm" "messageId=$validator.escapeUrl($message.Id)")'; return false;" title="$tlang.getString("list.delthitop")">				
+													<img src = "#imageLink("sakai/delete.gif")" border="0" alt="$tlang.getString("list.delthitop")" /></a>
+												#else
+												<a href="#" onclick="location='#toolLinkParam($action "doDelete_message_confirm" "messageId=$validator.escapeUrl($message.Id)")'; return false;" title="$tlang.getString("list.delthitop")">				
 													<img src = "#imageLink("sakai/delete.gif")" border="0" alt="$tlang.getString("list.delthi")" /></a>
+												#end	
 											#end
 										#else
 											<h4 style="display:inline">
