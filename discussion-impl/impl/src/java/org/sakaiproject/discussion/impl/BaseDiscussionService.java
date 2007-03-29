@@ -46,6 +46,7 @@ import org.sakaiproject.entity.api.ContextObserver;
 import org.sakaiproject.entity.api.Edit;
 import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.EntityTransferrer;
+import org.sakaiproject.entity.api.Summary;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entity.api.ResourcePropertiesEdit;
@@ -66,10 +67,12 @@ import org.sakaiproject.message.api.MessageHeaderEdit;
 import org.sakaiproject.message.impl.BaseMessageService;
 import org.sakaiproject.site.cover.SiteService;
 import org.sakaiproject.time.api.Time;
+import org.sakaiproject.time.cover.TimeService;
 import org.sakaiproject.tool.cover.SessionManager;
 import org.sakaiproject.tool.cover.ToolManager;
 import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.util.StringUtil;
+import org.sakaiproject.util.Validator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -673,6 +676,23 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 		return "discussion";
 	}
 
+        /**********************************************************************************************************************************************************************************************************************************************************
+         * getSummaryFromHeader implementation
+         *********************************************************************************************************************************************************************************************************************************************************/
+         protected String getSummaryFromHeader(Message item, MessageHeader header)
+         {
+            String newText;
+            if ( header instanceof DiscussionMessageHeader) {
+                DiscussionMessageHeader hdr = (DiscussionMessageHeader) header;
+                newText = hdr.getSubject();
+            } else {
+              newText = item.getBody();
+              if ( newText.length() > 50 ) newText = newText.substring(1,49);
+            }
+            newText = newText + ", " + header.getFrom().getDisplayName() + ", " + header.getDate().toStringLocalFull();
+            return newText;
+        }
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -788,22 +808,26 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 											{
 												// add the new resource into attachment collection area
 												ContentResource attachment = ContentHostingService.addAttachmentResource(
-														oAttachment.getProperties().getProperty(
-																ResourceProperties.PROP_DISPLAY_NAME), ToolManager
-																.getCurrentPlacement().getContext(), ToolManager.getTool(
-																"sakai.discussion").getTitle(), oAttachment.getContentType(),
-														oAttachment.getContent(), oAttachment.getProperties());
+														Validator.escapeResourceName(oAttachment.getProperties().getProperty(ResourceProperties.PROP_DISPLAY_NAME)), 
+														ToolManager.getCurrentPlacement().getContext(), 
+														ToolManager.getTool("sakai.discussion").getTitle(), 
+														oAttachment.getContentType(),
+														oAttachment.getContent(), 
+														oAttachment.getProperties());
 												// add to attachment list
 												nAttachments.add(m_entityManager.newReference(attachment.getReference()));
 											}
 											else
 											{
 												// add the new resource into resource area
-												ContentResource attachment = ContentHostingService.addResource(oAttachment
-														.getProperties().getProperty(ResourceProperties.PROP_DISPLAY_NAME),
-														ToolManager.getCurrentPlacement().getContext(), 1, oAttachment
-																.getContentType(), oAttachment.getContent(), oAttachment
-																.getProperties(), NotificationService.NOTI_NONE);
+												ContentResource attachment = ContentHostingService.addResource(
+														Validator.escapeResourceName(oAttachment.getProperties().getProperty(ResourceProperties.PROP_DISPLAY_NAME)),
+														ToolManager.getCurrentPlacement().getContext(), 
+														1, 
+														oAttachment.getContentType(), 
+														oAttachment.getContent(), 
+														oAttachment.getProperties(), 
+														NotificationService.NOTI_NONE);
 												// add to attachment list
 												nAttachments.add(m_entityManager.newReference(attachment.getReference()));
 											}

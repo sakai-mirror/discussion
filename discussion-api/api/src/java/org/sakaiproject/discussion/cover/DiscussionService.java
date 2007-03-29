@@ -1,6 +1,6 @@
 /**********************************************************************************
- * $URL: https://source.sakaiproject.org/svn/discussion/trunk/discussion-api/api/src/java/org/sakaiproject/discussion/cover/DiscussionService.java $
- * $Id: DiscussionService.java 9903 2006-05-24 20:01:35Z ggolden@umich.edu $
+ * $URL$
+ * $Id$
  ***********************************************************************************
  *
  * Copyright (c) 2003, 2004, 2005, 2006 The Sakai Foundation.
@@ -271,4 +271,14 @@ public class DiscussionService
 
 		return service.archive(param0, param1, param2, param3, param4);
 	}
+
+        public static java.util.Map getSummary( java.lang.String param0, int param1, int param2)
+                        throws org.sakaiproject.exception.IdUsedException, org.sakaiproject.exception.IdInvalidException,
+                        org.sakaiproject.exception.PermissionException
+        {
+                org.sakaiproject.discussion.api.DiscussionService service = getInstance();
+                if (service == null) return null;
+
+                return service.getSummary(param0, param1, param2);
+        }
 }

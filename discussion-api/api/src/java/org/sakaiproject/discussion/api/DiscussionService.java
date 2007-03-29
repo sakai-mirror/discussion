@@ -1,6 +1,6 @@
 /**********************************************************************************
- * $URL: https://source.sakaiproject.org/svn/discussion/trunk/discussion-api/api/src/java/org/sakaiproject/discussion/api/DiscussionService.java $
- * $Id: DiscussionService.java 12010 2006-07-12 16:51:45Z zqian@umich.edu $
+ * $URL$
+ * $Id$
  ***********************************************************************************
  *
  * Copyright (c) 2003, 2004, 2005, 2006 The Sakai Foundation.
@@ -95,4 +95,5 @@ public interface DiscussionService extends MessageService
 	 *            if the user does not have permission to add a channel.
 	 */
 	public DiscussionChannelEdit addDiscussionChannel(String ref) throws IdUsedException, IdInvalidException, PermissionException;
+
 }
