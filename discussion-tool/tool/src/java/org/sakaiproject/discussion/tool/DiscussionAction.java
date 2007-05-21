@@ -3261,7 +3261,8 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	 */
 	public void doExpand_category(RunData data, Context context)
 	{
-		String category = data.getParameters().getString("category");
+		ParameterParser params = data.getParameters();
+		String category = FormattedText.decodeNumericCharacterReferences(params.getString("category"));
 		SessionState state = ((JetspeedRunData) data).getPortletSessionState(((JetspeedRunData) data).getJs_peid());
 
 		String channelId = (String) state.getAttribute(STATE_CHANNEL_REF);
@@ -3289,7 +3290,8 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	{
 		SessionState state = ((JetspeedRunData) data).getPortletSessionState(((JetspeedRunData) data).getJs_peid());
 
-		String category = data.getParameters().getString("category");
+		ParameterParser params = data.getParameters();
+		String category = FormattedText.decodeNumericCharacterReferences(params.getString("category"));
 
 		String channelId = (String) state.getAttribute(STATE_CHANNEL_REF);
 		try
