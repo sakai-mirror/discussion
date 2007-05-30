@@ -1,20 +1,20 @@
 /**********************************************************************************
- * $URL: https://source.sakaiproject.org/svn/discussion/trunk/discussion-impl/impl/src/java/org/sakaiproject/discussion/impl/DbDiscussionService.java $
- * $Id: DbDiscussionService.java 8232 2006-04-25 01:11:55Z ggolden@umich.edu $
+ * $URL$
+ * $Id$
  ***********************************************************************************
  *
  * Copyright (c) 2003, 2004, 2005, 2006 The Sakai Foundation.
- * 
- * Licensed under the Educational Community License, Version 1.0 (the "License"); 
- * you may not use this file except in compliance with the License. 
+ *
+ * Licensed under the Educational Community License, Version 1.0 (the "License");
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.opensource.org/licenses/ecl1.php
- * 
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, 
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and 
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
  * limitations under the License.
  *
  **********************************************************************************/
@@ -24,12 +24,14 @@ package org.sakaiproject.discussion.impl;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.db.api.SqlReader;
 import org.sakaiproject.db.api.SqlService;
 import org.sakaiproject.discussion.api.DiscussionMessage;
+import org.sakaiproject.discussion.api.DiscussionServiceSql;
 import org.sakaiproject.message.api.Message;
 import org.sakaiproject.message.api.MessageChannel;
 import org.sakaiproject.message.api.MessageChannelEdit;
@@ -74,7 +76,7 @@ public class DbDiscussionService extends BaseDiscussionService
 
 	/**
 	 * Dependency: SqlService.
-	 * 
+	 *
 	 * @param service
 	 *        The SqlService.
 	 */
@@ -85,7 +87,7 @@ public class DbDiscussionService extends BaseDiscussionService
 
 	/**
 	 * Configuration: set the table name for the container.
-	 * 
+	 *
 	 * @param path
 	 *        The table name for the container.
 	 */
@@ -96,7 +98,7 @@ public class DbDiscussionService extends BaseDiscussionService
 
 	/**
 	 * Configuration: set the table name for the resource.
-	 * 
+	 *
 	 * @param path
 	 *        The table name for the resource.
 	 */
@@ -107,7 +109,7 @@ public class DbDiscussionService extends BaseDiscussionService
 
 	/**
 	 * Configuration: set the locks-in-db
-	 * 
+	 *
 	 * @param path
 	 *        The storage path.
 	 */
@@ -121,7 +123,7 @@ public class DbDiscussionService extends BaseDiscussionService
 
 	/**
 	 * Configuration: run the to-draft/owner conversion
-	 * 
+	 *
 	 * @param value
 	 *        The conversion desired value.
 	 */
@@ -135,7 +137,7 @@ public class DbDiscussionService extends BaseDiscussionService
 
 	/**
 	 * Configuration: to run the ddl on init or not.
-	 * 
+	 *
 	 * @param value
 	 *        the auto ddl value.
 	 */
@@ -143,6 +145,24 @@ public class DbDiscussionService extends BaseDiscussionService
 	{
 		m_autoDdl = new Boolean(value).booleanValue();
 	}
+
+   protected Map<String, DiscussionServiceSql> databaseBeans;             // contains a map of the database dependent beans injected by spring
+   protected DiscussionServiceSql              discussionServiceSql;      // contains database dependent code
+
+   public void setDatabaseBeans(Map databaseBeans) {
+     this.databaseBeans = databaseBeans;
+   }
+
+   public DiscussionServiceSql getDiscussionServiceSql() {
+      return discussionServiceSql;
+   }
+
+   /**
+    * sets which bean containing database dependent code should be used depending on the database vendor.
+    */
+   public void setDiscussionServiceSql(String vendor) {
+      this.discussionServiceSql = (databaseBeans.containsKey(vendor) ? databaseBeans.get(vendor) : databaseBeans.get("default"));
+   }
 
 	/**********************************************************************************************************************************************************************************************************************************************************
 	 * Init and Destroy
@@ -162,6 +182,7 @@ public class DbDiscussionService extends BaseDiscussionService
 			}
 
 			super.init();
+         setDiscussionServiceSql(m_sqlService.getVendor());
 
 			M_log.info("init(): tables: " + m_cTableName + " " + m_rTableName + " locks-in-db: " + m_locksInDb);
 
@@ -184,7 +205,7 @@ public class DbDiscussionService extends BaseDiscussionService
 
 	/**
 	 * Construct a Storage object.
-	 * 
+	 *
 	 * @return The new storage object.
 	 */
 	protected Storage newStorage()
@@ -201,7 +222,7 @@ public class DbDiscussionService extends BaseDiscussionService
 	{
 		/**
 		 * Construct.
-		 * 
+		 *
 		 * @param user
 		 *        The StorageUser class to call back for creation of Resource and Edit objects.
 		 */
@@ -322,8 +343,8 @@ public class DbDiscussionService extends BaseDiscussionService
 			boolean wasCommit = connection.getAutoCommit();
 			connection.setAutoCommit(false);
 
-			// read all message records that need conversion
-			String sql = "select CHANNEL_ID, MESSAGE_ID, XML from " + m_rTableName /* + " where OWNER is null" */;
+         // read all message records that need conversion
+         String sql = discussionServiceSql.getMessagesSql(m_rTableName);
 			m_sqlService.dbRead(connection, sql, null, new SqlReader()
 			{
 				private int count = 0;
@@ -356,8 +377,7 @@ public class DbDiscussionService extends BaseDiscussionService
 						String replyTo = m.getDiscussionHeader().getReplyTo();
 
 						// update
-						String update = "update " + m_rTableName
-								+ " set OWNER = ?, DRAFT = ?, CATEGORY = ?, REPLY = ? where CHANNEL_ID = ? and MESSAGE_ID = ?";
+                  String update = discussionServiceSql.getUpdateMessageSql(m_rTableName);
 						Object fields[] = new Object[6];
 						fields[0] = owner;
 						fields[1] = (draft ? "1" : "0");
