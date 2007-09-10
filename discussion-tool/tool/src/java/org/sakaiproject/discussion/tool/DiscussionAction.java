@@ -1160,7 +1160,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 						}
 
 						DiscussionMessage topic = m;
-						StringBuffer messagePath = new StringBuffer(Validator.escapeHtml(m.getDiscussionHeader().getSubject()));
+						StringBuilder messagePath = new StringBuilder(Validator.escapeHtml(m.getDiscussionHeader().getSubject()));
 						while (topic.getReplyToDepth() != 0)
 						{
 							replyTo = topic.getDiscussionHeader().getReplyTo();
@@ -1532,7 +1532,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 
 				DiscussionMessage topic = m;
 				String replyTo = "";
-				StringBuffer replyPath = new StringBuffer(Validator.escapeHtml(m.getDiscussionHeader().getSubject()));
+				StringBuilder replyPath = new StringBuilder(Validator.escapeHtml(m.getDiscussionHeader().getSubject()));
 				while (topic.getReplyToDepth() != 0)
 				{
 					replyTo = topic.getDiscussionHeader().getReplyTo();
@@ -3783,7 +3783,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	 */
 	private String processFormattedTextFromBrowser(SessionState state, String strFromBrowser)
 	{
-		StringBuffer alertMsg = new StringBuffer();
+		StringBuilder alertMsg = new StringBuilder();
 		try
 		{
 			String text = FormattedText.processFormattedText(strFromBrowser, alertMsg);
