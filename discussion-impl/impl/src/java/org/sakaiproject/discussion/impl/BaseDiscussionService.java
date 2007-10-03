@@ -592,7 +592,7 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 	public String archive(String siteId, Document doc, Stack stack, String archivePath, List attachments)
 	{
 		// prepare the buffer for the results log
-		StringBuffer results = new StringBuffer();
+		StringBuilder results = new StringBuilder();
 
 		// start with an element with our very own (service) name
 		Element element = doc.createElement(serviceName());
@@ -1989,5 +1989,15 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 		} // accept
 
 	} // PrivacyFilter
+
+	/* (non-Javadoc)
+	 * @see org.sakaiproject.entity.api.EntitySummary#summarizableToolIds()
+	 */
+	public String[] summarizableToolIds()
+	{
+		return new String[] {
+				"sakai.discussion"
+		};
+	}
 
 } // BaseDiscussionService
