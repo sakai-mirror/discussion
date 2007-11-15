@@ -1,5 +1,5 @@
 /**********************************************************************************
- * $URL: https://source.sakaiproject.org/svn/discussion/trunk/discussion-api/api/src/java/org/sakaiproject/discussion/api/DiscussionMessageHeader.java $
+ * $URL: https://source.sakaiproject.org/svn/discussion/tags/sakai_2-2-1/discussion-api/api/src/java/org/sakaiproject/discussion/api/DiscussionMessageHeader.java $
  * $Id: DiscussionMessageHeader.java 8232 2006-04-25 01:11:55Z ggolden@umich.edu $
  ***********************************************************************************
  *
