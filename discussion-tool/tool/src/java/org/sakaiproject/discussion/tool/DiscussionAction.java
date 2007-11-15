@@ -1,6 +1,6 @@
 /**********************************************************************************
- * $URL$
- * $Id$
+ * $URL: https://source.sakaiproject.org/svn/discussion/branches/sakai_2-3-x/discussion-tool/tool/src/java/org/sakaiproject/discussion/tool/DiscussionAction.java $
+ * $Id: DiscussionAction.java 15785 2006-10-06 19:43:57Z zqian@umich.edu $
  ***********************************************************************************
  *
  * Copyright (c) 2003, 2004, 2005, 2006 The Sakai Foundation.

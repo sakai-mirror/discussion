@@ -1,5 +1,5 @@
 /**********************************************************************************
- * $URL: https://source.sakaiproject.org/svn/discussion/trunk/discussion-impl/impl/src/java/org/sakaiproject/discussion/impl/DbDiscussionService.java $
+ * $URL: https://source.sakaiproject.org/svn/discussion/branches/sakai_2-3-x/discussion-impl/impl/src/java/org/sakaiproject/discussion/impl/DbDiscussionService.java $
  * $Id: DbDiscussionService.java 8232 2006-04-25 01:11:55Z ggolden@umich.edu $
  ***********************************************************************************
  *
