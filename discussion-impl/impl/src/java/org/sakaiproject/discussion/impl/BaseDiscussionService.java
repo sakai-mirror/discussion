@@ -1,6 +1,6 @@
 /**********************************************************************************
- * $URL$
- * $Id$
+ * $URL: https://source.sakaiproject.org/svn/discussion/trunk/discussion-impl/impl/src/java/org/sakaiproject/discussion/impl/BaseDiscussionService.java $
+ * $Id: BaseDiscussionService.java 12248 2006-07-14 16:29:35Z zqian@umich.edu $
  ***********************************************************************************
  *
  * Copyright (c) 2003, 2004, 2005, 2006 The Sakai Foundation.
