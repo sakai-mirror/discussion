@@ -838,7 +838,7 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 						String currentCategory = (String) i.next();
 
 						// the category is expanded; get the most recent topics
-						if (expandedCategories.contains(currentCategory))
+						if (expandedCategories != null && expandedCategories.contains(currentCategory))
 						{
 							Hashtable showList = (Hashtable) state.getAttribute(STATE_CATEGORIES_SHOW_LIST);
 							Vector v = (Vector) showList.get(currentCategory);
