@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Observable;
 import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
@@ -1245,7 +1246,7 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 							.getReference(), true, NotificationService.NOTI_NONE);
 					EventTrackingService.post(event);
 					// channel notification
-					notify(event);
+					startNotifyThread(event);
 					// close the edit object
 					((BaseDiscussionChannelEdit) e).closeEdit();
 
@@ -1306,7 +1307,7 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 								.getReference(), true, NotificationService.NOTI_NONE);
 						EventTrackingService.post(event);
 						// channel notification
-						notify(event);
+						startNotifyThread(event);
 
 						// close the edit object
 						((BaseDiscussionChannelEdit) e).closeEdit();
@@ -1998,6 +1999,11 @@ public abstract class BaseDiscussionService extends BaseMessageService implement
 		return new String[] {
 				"sakai.discussion"
 		};
+	}
+	
+	// ONC - added for SAK-12433
+	public void transferCopyEntities(String fromContext, String toContext, List ids, boolean cleanup) {
+		// discussion does not participate in this
 	}
 
 } // BaseDiscussionService
