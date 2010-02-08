@@ -1,6 +1,7 @@
 ##<!-- $Header: /cvs/sakai2/legacy/tools/src/webapp/vm/discussion/chef_threaded_discussionsII-Layout.vm,v 1.4 2005/05/31 20:21:52 zqian.umich.edu Exp $ -->
-<script  type="text/javascript" language="JavaScript" src="#scriptLink('discussionscript.js')">
+<script  type="text/javascript" language="JavaScript" src="/sakai-discussion-tool/js/discussionscript.js">
 </script>
+
 	<iframe
 		name="$validator.escapeJavascript("$panel-toolbar")"
 		id="$validator.escapeJavascript("$panel-toolbar")"
