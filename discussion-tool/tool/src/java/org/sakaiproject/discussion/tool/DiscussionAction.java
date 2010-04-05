@@ -2749,12 +2749,21 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	public void doSet_new_topic(RunData data, Context context)
 	{
 		SessionState state = ((JetspeedRunData) data).getPortletSessionState(((JetspeedRunData) data).getJs_peid());
-		state.removeAttribute(ATTACHMENTS);
-		state.setAttribute(STATE_MODE, MODE_NEW_TOPIC);
-		addAlert(state, "");
-
-		String peid = ((JetspeedRunData) data).getJs_peid();
-		schedulePeerFrameRefresh(VelocityPortletPaneledAction.mainPanelUpdateId(peid));
+		boolean allowAdd = allowAddCategoryOrTopic(state);
+		if (allowAdd)
+		{
+			state.removeAttribute(ATTACHMENTS);
+			state.setAttribute(STATE_MODE, MODE_NEW_TOPIC);
+			addAlert(state, "");
+	
+			String peid = ((JetspeedRunData) data).getJs_peid();
+			schedulePeerFrameRefresh(VelocityPortletPaneledAction.mainPanelUpdateId(peid));
+		}
+		else
+		{
+			// show alert message
+			addAlert(state, rb.getString("youarenot8"));
+		}
 
 	} // doSet_new_topic
 
@@ -2764,15 +2773,57 @@ public class DiscussionAction extends VelocityPortletPaneledAction
 	public void doSet_new_category(RunData data, Context context)
 	{
 		SessionState state = ((JetspeedRunData) data).getPortletSessionState(((JetspeedRunData) data).getJs_peid());
-		state.removeAttribute(ATTACHMENTS);
-		state.removeAttribute(NEW_CATEGORY);
-		state.setAttribute(STATE_MODE, MODE_NEW_CATEGORY);
-		addAlert(state, "");
-
-		String peid = ((JetspeedRunData) data).getJs_peid();
-		schedulePeerFrameRefresh(VelocityPortletPaneledAction.mainPanelUpdateId(peid));
+		boolean allowAdd = allowAddCategoryOrTopic(state);
+		if (allowAdd)
+		{
+			state.removeAttribute(ATTACHMENTS);
+			state.removeAttribute(NEW_CATEGORY);
+			state.setAttribute(STATE_MODE, MODE_NEW_CATEGORY);
+			addAlert(state, "");
+	
+			String peid = ((JetspeedRunData) data).getJs_peid();
+			schedulePeerFrameRefresh(VelocityPortletPaneledAction.mainPanelUpdateId(peid));
+		}
+		else
+		{
+			// show alert message
+			addAlert(state, rb.getString("youarenot7"));
+		}
 
 	} // doSet_new_category
+
+	/**
+	 * check whether current user can add new topic or category in the channel.
+	 * @param state
+	 * @return
+	 */
+	private boolean allowAddCategoryOrTopic(SessionState state) {
+		String channelId = (String) state.getAttribute(STATE_CHANNEL_REF);
+		boolean allowNewCategory = false;
+		try
+		{
+			// get the current channel ID from state object
+			DiscussionChannel channel = DiscussionService.getDiscussionChannel(channelId);
+			// detect whether channel is existed
+			if (channel != null)
+			{
+				allowNewCategory = channel.allowAddTopicMessage();
+			}
+			else
+			{
+				allowNewCategory = DiscussionService.allowAddChannel(channelId);
+			}
+		}
+		catch (IdUnusedException e)
+		{
+			addAlert(state, rb.getString("cannotfin5"));
+		}
+		catch (PermissionException e)
+		{
+			addAlert(state, rb.getString("youdonot1"));
+		}
+		return allowNewCategory;
+	}
 
 	/**
 	 * Setup for options. %%% Note: not sure this and doUpdate are correct, not currently invoked (no menu entry) -ggolden
