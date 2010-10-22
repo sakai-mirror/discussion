@@ -5,7 +5,7 @@
 	<tool
 			id="sakai.discussion"
 			title="Discussion"
-			description="For conversations in written form.">
+			description="Deprecated tool: please use Forums or other alternative">
 
 		<configuration name="category" value="false" />
 		<configuration name="channel" value="" />
