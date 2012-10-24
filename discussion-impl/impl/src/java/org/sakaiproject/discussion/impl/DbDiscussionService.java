@@ -36,6 +36,7 @@ import org.sakaiproject.message.api.MessageChannelEdit;
 import org.sakaiproject.message.api.MessageEdit;
 import org.sakaiproject.time.api.Time;
 import org.sakaiproject.util.BaseDbDoubleStorage;
+import org.sakaiproject.util.DoubleStorageUser;
 import org.sakaiproject.util.StorageUser;
 import org.sakaiproject.util.Xml;
 import org.sakaiproject.javax.Filter;
@@ -207,7 +208,7 @@ public class DbDiscussionService extends BaseDiscussionService
 		 * @param user
 		 *        The StorageUser class to call back for creation of Resource and Edit objects.
 		 */
-		public DbStorage(StorageUser user)
+		public DbStorage(DoubleStorageUser user)
 		{
 			super(m_cTableName, "CHANNEL_ID", m_rTableName, "MESSAGE_ID", "CHANNEL_ID", "MESSAGE_DATE", "OWNER", "DRAFT",
 					"PUBVIEW", FIELDS, m_locksInDb, "channel", "message", user, m_sqlService);
